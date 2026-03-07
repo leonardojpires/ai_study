@@ -18,5 +18,19 @@
     "@vitejs/plugin-react": "^4.4.1",
     "typescript": "^5.7.2",
     "vite": "^7.3.1"
-  }
+  },
+  "description": "Frontend for the AI-powered Study Plan Generator.",
+  "main": "vite.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leonardojpires/ai_study.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "types": "./vite.config.d.ts",
+  "bugs": {
+    "url": "https://github.com/leonardojpires/ai_study/issues"
+  },
+  "homepage": "https://github.com/leonardojpires/ai_study#readme"
 }
