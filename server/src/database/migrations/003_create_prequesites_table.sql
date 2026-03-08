@@ -1,10 +1,8 @@
-USE study_planner;
-
 CREATE TABLE IF NOT EXISTS prerequisites (
     topic_id INT UNSIGNED NOT NULL,
     required_topic_id INT UNSIGNED NOT NULL,
 
-    created_at TIMESTAMP DEFAULT CURRENT TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (topic_id, required_topic_id),
 
