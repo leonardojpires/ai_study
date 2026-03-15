@@ -1,8 +1,10 @@
+import bcrypt from 'bcrypt';
+
 export class User {
     public id?: number | undefined;
     public name: string;
     public email: string;
-    public passwordHash: string;
+    private passwordHash: string;
     public isAdmin: boolean;
     public createdAt: Date;
     public updatedAt: Date;
@@ -27,5 +29,9 @@ export class User {
 
     public isAdminUser(): boolean {
         return this.isAdmin;
+    }
+
+    public async checkPassword(password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.passwordHash);
     }
 }
