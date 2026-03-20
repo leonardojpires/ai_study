@@ -34,4 +34,12 @@ export class User {
     public async checkPassword(password: string): Promise<boolean> {
         return bcrypt.compare(password, this.passwordHash);
     }
+
+    public async setPassword(password: string): Promise<void> {
+        this.passwordHash = await bcrypt.hash(password, 10);
+    }
+
+    public get getPassword(): string {
+        return this.passwordHash;
+    }
 }
