@@ -35,11 +35,16 @@ export class User {
         return bcrypt.compare(password, this.passwordHash);
     }
 
-    public async setPassword(password: string): Promise<void> {
-        this.passwordHash = await bcrypt.hash(password, 10);
-    }
+    // public async setPassword(password: string): Promise<void> {
+    //     this.passwordHash = await bcrypt.hash(password, 10);
+    // }
 
     public get getPassword(): string {
         return this.passwordHash;
+    }
+
+    public toSafeObject() {
+        const { id, name, email, isAdmin, createdAt, updatedAt } = this;
+        return { id, name, email, isAdmin, createdAt, updatedAt };
     }
 }
