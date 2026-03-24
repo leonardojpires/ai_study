@@ -3,3 +3,7 @@ dist
 .env
 .DS_Store
 *.log
+
+/server/tests/
+/tests/
+server/tests/auth.test.ts

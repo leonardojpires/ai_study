@@ -20,13 +20,15 @@ export class AuthService {
         await this.userRepository.save(newUser);
 
         return {
-            message: "Registration successful",
+            success: true,
             newUser
         }
     }
 
     async login(email: string, password: string) {
         if (!email || !password) throw new Error("Invalid input.");
+        if (!email.includes("@")) throw new Error("Invalid email.");
+        if (password.length < 6) throw new Error("Password must be at least 6 characters.");
 
         const user = await this.userRepository.findByEmail(email);
 
@@ -37,7 +39,7 @@ export class AuthService {
         if (!isPasswordValid) throw new Error("Invalid password.");
 
         return {
-            message: "Login successful",
+            success: true,
             user
         }
     }

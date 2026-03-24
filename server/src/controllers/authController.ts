@@ -11,7 +11,7 @@ export class AuthController {
             const result = await this.authService.register(name, email, password);
 
             return res.status(201).json({
-                message: result.message,
+                success: result.success,
                 user: result.newUser.toSafeObject
             });
         } catch(error: any) {
@@ -26,7 +26,7 @@ export class AuthController {
             const result = await this.authService.login(email, password);
 
             return res.status(200).json({
-                message: result.message,
+                success: result.success,
                 user: result.user.toSafeObject
             });
         } catch(error: any) {
