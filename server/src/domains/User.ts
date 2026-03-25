@@ -32,7 +32,7 @@ export class User {
     }
 
     public async checkPassword(password: string): Promise<boolean> {
-        return bcrypt.compare(password, this.passwordHash);
+        return await bcrypt.compare(password, this.passwordHash);
     }
 
     // public async setPassword(password: string): Promise<void> {

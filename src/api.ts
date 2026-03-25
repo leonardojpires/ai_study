@@ -1,3 +1,21 @@
+  // Auth API
+export async function loginUser(email: string, password: string): Promise<{ success: boolean; user: any }> {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  return parseJsonResponse(response);
+}
+
+export async function registerUser(name: string, email: string, password: string): Promise<{ success: boolean; user: any }> {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password })
+  });
+  return parseJsonResponse(response);
+}
 import { StudyPlanRequest, StudyPlanResponse, Topic } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";

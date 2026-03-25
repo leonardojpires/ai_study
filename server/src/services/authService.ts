@@ -8,6 +8,8 @@ export class AuthService {
 
     async register(name: string, email: string, password: string) {
         if (!name || !email || !password) throw new Error("Invalid input.");
+        if (!email.includes("@")) throw new Error("Invalid email.");
+        if (password.length < 6) throw new Error("Password must be at least 6 characters.");
 
         const user = await this.userRepository.findByEmail(email);
 
@@ -28,7 +30,6 @@ export class AuthService {
     async login(email: string, password: string) {
         if (!email || !password) throw new Error("Invalid input.");
         if (!email.includes("@")) throw new Error("Invalid email.");
-        if (password.length < 6) throw new Error("Password must be at least 6 characters.");
 
         const user = await this.userRepository.findByEmail(email);
 

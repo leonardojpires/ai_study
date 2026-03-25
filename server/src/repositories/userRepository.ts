@@ -16,7 +16,7 @@ export class UserRepository implements IUserRepository {
 
         if (!user) return null;
 
-        return new User(user.id, user.name, user.email, user.password, user.isAdmin, user.createdAt, user.updatedAt);
+        return new User(user.id, user.name, user.email, user.password_hash, user.isAdmin, user.createdAt, user.updatedAt);
     }
 
     async findById(id: number): Promise<User | null> {
@@ -26,7 +26,7 @@ export class UserRepository implements IUserRepository {
 
         if (!user) return null;
 
-        return new User(user.id, user.name, user.email, user.password, user.isAdmin, user.createdAt, user.updatedAt);
+        return new User(user.id, user.name, user.email, user.password_hash, user.isAdmin, user.createdAt, user.updatedAt);
     }
 
     async save(user: User): Promise<void> {
