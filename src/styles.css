@@ -159,14 +159,14 @@ p {
   font-weight: 600;
 }
 
-input,
-textarea,
-button {
+input:not([class]),
+textarea:not([class]),
+button:not([class]) {
   font: inherit;
 }
 
-input,
-textarea {
+input:not([class]),
+textarea:not([class]) {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -178,7 +178,7 @@ textarea {
   resize: vertical;
 }
 
-button {
+button:not([class]) {
   border: 0;
   border-radius: 10px;
   background: var(--accent);
@@ -188,11 +188,11 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+button:not([class]):hover {
   background: var(--accent-strong);
 }
 
-button:disabled {
+button:not([class]):disabled {
   opacity: 0.7;
   cursor: wait;
 }
