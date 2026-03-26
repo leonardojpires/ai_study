@@ -29,6 +29,14 @@ export class UserRepository implements IUserRepository {
         return new User(user.id, user.name, user.email, user.password_hash, user.isAdmin, user.createdAt, user.updatedAt);
     }
 
+    async findAll(): Promise<User[]> {
+        const [users] = await pool.query<RowDataPacket[]>('SELECT * FROM users');
+
+        return users.map(
+            (userRow) => new User(userRow.id, userRow.name, userRow.email, userRow.password_hash, userRow.isAdmin, userRow.createdAt, userRow.updatedAt) 
+        )
+    }
+
     async save(user: User): Promise<void> {
         if (user.id) {
             await pool.query('UPDATE users SET name = ?, email = ?, password_hash = ?, is_admin = ? WHERE id = ?', [user.name, user.email, user.getPassword, user.isAdmin, user.id]);

@@ -13,12 +13,14 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
 
   const charCount = useMemo(() => prompt.length, [prompt]);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await onSubmit({
+    onSubmit({
       prompt: prompt.trim(),
       weeks,
       hoursPerWeek,
+    }).catch((err) => {
+      console.error("PromptForm submit error:", err);
     });
   }
 

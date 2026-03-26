@@ -1,47 +1,34 @@
-  // Auth API
-export async function loginUser(email: string, password: string): Promise<{ success: boolean; user: any }> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
-  return parseJsonResponse(response);
-}
-
-export async function registerUser(name: string, email: string, password: string): Promise<{ success: boolean; user: any }> {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, email, password })
-  });
-  return parseJsonResponse(response);
-}
 import { StudyPlanRequest, StudyPlanResponse, Topic } from "./types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";
-
-async function parseJsonResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const details = await response.text();
-    throw new Error(details || `Request failed with status ${response.status}`);
-  }
-
-  return (await response.json()) as T;
-}
+const mockTopics: Topic[] = [
+  { id: 1, name: "React", description: "Componentes, hooks e estado", category: "Frontend" },
+  { id: 2, name: "TypeScript", description: "Tipos sólidos para JavaScript", category: "Frontend" },
+  { id: 3, name: "Node.js", description: "Construção de APIs e microsserviços", category: "Backend" },
+  { id: 4, name: "SQL", description: "Consultas e modelagem de dados", category: "Database" },
+  { id: 5, name: "Docker", description: "Containerização de aplicações", category: "DevOps" },
+];
 
 export async function fetchTopics(): Promise<Topic[]> {
-  const response = await fetch(`${API_BASE_URL}/topics`);
-  return parseJsonResponse<Topic[]>(response);
+  await new Promise(resolve => setTimeout(resolve, 250));
+  return mockTopics;
 }
 
 export async function createStudyPlan(payload: StudyPlanRequest): Promise<StudyPlanResponse> {
-  const response = await fetch(`${API_BASE_URL}/study-plan`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
-
-  return parseJsonResponse<StudyPlanResponse>(response);
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const plan: StudyPlanResponse = {
+    title: `Plano de estudo: ${payload.prompt}`,
+    summary: `Estimativa para ${payload.weeks} semanas com ${payload.hoursPerWeek} horas por semana.`,
+    weeks: Array.from({ length: payload.weeks }, (_, index) => ({
+      week: index + 1,
+      title: `Semana ${index + 1}`,
+      objectives: [
+        `Tema principal: ${payload.prompt}`,
+        "Revisão de conceitos chave",
+        "Prática com exercícios e projetos"
+      ],
+      topics: payload.topicIds ? payload.topicIds.map(id => mockTopics.find(topic => topic.id === id)?.name || "Tópico selecionado") : ["Tópico sugerido"],
+    })),
+  };
+  return plan;
 }
+

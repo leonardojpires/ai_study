@@ -4,6 +4,7 @@ import { AuthController } from "../controllers/AuthController.js";
 import { UserRepository } from "../repositories/userRepository.js";
 
 const authRouter = Router();
+
 const userRepository = new UserRepository();
 const authService = new AuthService(userRepository);
 const authController = new AuthController(authService);

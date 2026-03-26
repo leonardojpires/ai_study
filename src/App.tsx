@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
-import { createStudyPlan, fetchTopics } from "./api";
 import { PromptForm } from "./components/PromptForm";
 import { StatusBanner } from "./components/StatusBanner";
 import { StudyPlanTimeline } from "./components/StudyPlanTimeline";
@@ -39,54 +38,63 @@ export function App() {
     { id: 3, name: 'Cara Smith', email: 'cara@example.com', role: 'admin', active: true, password: 'cara123' },
   ]);
 
+  const mockTopics = [
+    { id: 1, name: 'React', description: 'Componentes, hooks e estado', category: 'Frontend' },
+    { id: 2, name: 'TypeScript', description: 'Tipos sólidos para JavaScript', category: 'Frontend' },
+    { id: 3, name: 'Node.js', description: 'Construção de APIs e microsserviços', category: 'Backend' },
+    { id: 4, name: 'SQL', description: 'Consultas e modelagem de dados', category: 'Database' },
+    { id: 5, name: 'Docker', description: 'Containerização de aplicações', category: 'DevOps' },
+  ];
+
   useEffect(() => {
     if (!currentUser) {
       setTopics([]);
       return;
     }
-    async function loadTopics() {
-      try {
-        setIsTopicsLoading(true);
-        const response = await fetchTopics();
-        setTopics(response);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to load topics.";
-        setErrorMessage(message);
-      } finally {
-        setIsTopicsLoading(false);
-      }
-    }
-    void loadTopics();
+
+    setIsTopicsLoading(true);
+    const timer = setTimeout(() => {
+      setTopics(mockTopics);
+      setIsTopicsLoading(false);
+    }, 250);
+
+    return () => clearTimeout(timer);
   }, [currentUser]);
 
-  async function handleGenerate(values: { prompt: string; weeks: number; hoursPerWeek: number }) {
+  function handleGenerate(values: { prompt: string; weeks: number; hoursPerWeek: number }): Promise<void> {
     setErrorMessage(null);
     setSuccessMessage(null);
-    try {
-      setIsGenerating(true);
-      const generated = await createStudyPlan({
-        prompt: values.prompt,
-        weeks: values.weeks,
-        hoursPerWeek: values.hoursPerWeek,
-        topicIds: selectedTopicIds.length > 0 ? selectedTopicIds : undefined
-      });
-      setStudyPlan(generated);
-      setSuccessMessage("Study plan generated successfully.");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to generate study plan.";
-      setErrorMessage(message);
-    } finally {
-      setIsGenerating(false);
-    }
+    setIsGenerating(true);
+
+    const generated = {
+      title: `Plano de estudo: ${values.prompt}`,
+      summary: `Plano de ${values.weeks} semanas com ${values.hoursPerWeek} horas/semana`,
+      weeks: Array.from({ length: values.weeks }, (_, i) => ({
+        week: i + 1,
+        title: `Semana ${i + 1}`,
+        objectives: [
+          `${values.prompt} (foco)`,
+          "Revisão de conceitos chave",
+          "Prática em exercícios específicos"
+        ],
+        topics: selectedTopicIds.length > 0
+          ? selectedTopicIds.map(id => mockTopics.find(t => t.id === id)?.name ?? 'Tópico')
+          : ['Tópico sugerido']
+      }))
+    };
+
+    setStudyPlan(generated);
+    setSuccessMessage("Study plan generated successfully.");
+    setIsGenerating(false);
+
+    return Promise.resolve();
   }
 
   // Real authentication handlers
-  async function handleLogin(email: string, password: string) {
+  function handleLogin(email: string, password: string) {
     setAuthError(null);
     setAuthSuccess(null);
     setAuthLoading(true);
-
-    await new Promise(resolve => setTimeout(resolve, 400));
 
     const foundUser = mockUsers.find(user => user.email.toLowerCase() === email.toLowerCase() && user.password === password);
     if (!foundUser) {
@@ -100,12 +108,10 @@ export function App() {
     setAuthLoading(false);
   }
 
-  async function handleRegister(name: string, email: string, password: string) {
+  function handleRegister(name: string, email: string, password: string) {
     setAuthError(null);
     setAuthSuccess(null);
     setAuthLoading(true);
-
-    await new Promise(resolve => setTimeout(resolve, 400));
 
     const existing = mockUsers.find(user => user.email.toLowerCase() === email.toLowerCase());
     if (existing) {
