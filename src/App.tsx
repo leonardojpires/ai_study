@@ -9,6 +9,7 @@ import { RegisterForm } from "./components/RegisterForm";
 import Navbar from "./components/Navbar";
 import UsersDashboard from "./components/UsersDashboard";
 import { StudyPlanResponse, Topic } from "./types";
+import { fetchAllUsers } from "./api";
 
 type User = {
   id: number;
@@ -32,6 +33,7 @@ export function App() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [mockUsers, setMockUsers] = useState<User[]>([
     { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'student', active: true, password: 'pass123' },
     { id: 2, name: 'Bob Carter', email: 'bob@example.com', role: 'instructor', active: true, password: 'bob123' },
@@ -60,6 +62,30 @@ export function App() {
 
     return () => clearTimeout(timer);
   }, [currentUser]);
+
+  useEffect(() => {
+    if (page !== 'dashboard') return;
+
+    const loadUsers = async () => {
+      try {
+        const apiUsers = await fetchAllUsers();
+
+        setUsers(apiUsers.map(apiUser => ({
+          id: apiUser.id,
+          name: apiUser.name,
+          email: apiUser.email,
+          role: apiUser.isAdmin ? 'admin' : 'student',
+          active: true,
+          password: ''
+        })));
+      } catch (error: any) {
+        console.error('Failed to fetch users:', error);
+        setUsers(mockUsers); // fallback or keep existing
+      }
+    };
+
+    loadUsers();
+  }, [page, mockUsers]);
 
   function handleGenerate(values: { prompt: string; weeks: number; hoursPerWeek: number }): Promise<void> {
     setErrorMessage(null);
@@ -175,13 +201,22 @@ export function App() {
           </div>
         ) : page === 'dashboard' ? (
           <UsersDashboard
-            users={mockUsers}
+            users={users.length > 0 ? users : mockUsers}
             onAddUser={(userData) => {
-              setMockUsers(prev => [...prev, { ...userData, id: prev.length + 1 }]);
+              const nextId = Math.max(...(users.length > 0 ? users.map(u => u.id) : mockUsers.map(u => u.id))) + 1;
+              const newUser = { ...userData, id: nextId };
+              setUsers(prev => [...prev, newUser]);
+              setMockUsers(prev => [...prev, newUser]);
               setAuthSuccess(`Usuário ${userData.name} adicionado com sucesso.`);
             }}
-            onUpdateUser={(updated) => setMockUsers(prev => prev.map(user => user.id === updated.id ? updated : user))}
-            onDeleteUser={(id) => setMockUsers(prev => prev.filter(user => user.id !== id))}
+            onUpdateUser={(updated) => {
+              setUsers(prev => prev.map(user => user.id === updated.id ? updated : user));
+              setMockUsers(prev => prev.map(user => user.id === updated.id ? updated : user));
+            }}
+            onDeleteUser={(id) => {
+              setUsers(prev => prev.filter(user => user.id !== id));
+              setMockUsers(prev => prev.filter(user => user.id !== id));
+            }}
             onBack={() => setPage('main')}
           />
         ) : (

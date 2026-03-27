@@ -1,4 +1,5 @@
 import { StudyPlanRequest, StudyPlanResponse, Topic } from "./types";
+import { ShowUserDTO } from './../server/src/dtos/ShowUserDTO';
 
 const mockTopics: Topic[] = [
   { id: 1, name: "React", description: "Componentes, hooks e estado", category: "Frontend" },
@@ -32,3 +33,12 @@ export async function createStudyPlan(payload: StudyPlanRequest): Promise<StudyP
   return plan;
 }
 
+export async function fetchAllUsers(): Promise<ShowUserDTO[]> {
+  const res = await fetch("http://localhost:3000/user/users");
+
+  if (!res.ok) throw new Error("Failed to load all users");
+
+  const data = await res.json();
+
+  return data.users;
+}
