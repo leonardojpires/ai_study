@@ -64,7 +64,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
             <tr className="bg-slate-100">
               <th className="px-3 py-2 border border-slate-200">Name</th>
               <th className="px-3 py-2 border border-slate-200">Email</th>
-              <th className="px-3 py-2 border border-slate-200">Role</th>
+              <th className="px-3 py-2 border border-slate-200">Is Admin</th>
               <th className="px-3 py-2 border border-slate-200">Status</th>
               <th className="px-3 py-2 border border-slate-200">Actions</th>
             </tr>
@@ -74,7 +74,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
               <tr key={user.id} className="hover:bg-slate-50">
                 <td className="px-3 py-2 border border-slate-200">{user.name}</td>
                 <td className="px-3 py-2 border border-slate-200">{user.email}</td>
-                <td className="px-3 py-2 border border-slate-200 uppercase tracking-wide text-xs">{user.role}</td>
+                <td className="px-3 py-2 border border-slate-200 uppercase tracking-wide text-xs">{user.isAdmin}</td>
                 <td className="px-3 py-2 border border-slate-200">
                   <span className={`rounded-full px-2 py-1 text-xs ${user.active ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
                     {user.active ? "Active" : "Inactive"}
