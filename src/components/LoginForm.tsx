@@ -19,7 +19,7 @@ export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <h2>Login to Your Account</h2>
-      <p className="text-xs text-slate-500">Use one of the demo users (e.g., alice@example.com / pass123) or register a new account.</p>
+      <p className="text-xs text-slate-500">Enter your account credentials to continue.</p>
       {error && <div className="error">{error}</div>}
 
       <label>

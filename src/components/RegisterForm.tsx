@@ -26,7 +26,7 @@ export function RegisterForm({ onRegister, isLoading, error }: RegisterFormProps
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <h2>Create an Account</h2>
-      <p className="text-xs text-slate-500">Mock registration, no backend call executed.</p>
+      <p className="text-xs text-slate-500">Create your account to start using the platform.</p>
       {localError ? <div className="error">{localError}</div> : error && <div className="error">{error}</div>}
 
       <label>

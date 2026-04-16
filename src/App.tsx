@@ -1,24 +1,12 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { createStudyPlan, fetchTopics, loginUser, registerUser } from "./api";
 import { PromptForm } from "./components/PromptForm";
 import { StatusBanner } from "./components/StatusBanner";
 import { StudyPlanTimeline } from "./components/StudyPlanTimeline";
 import { TopicSelector } from "./components/TopicSelector";
 import { LoginForm } from "./components/LoginForm";
 import { RegisterForm } from "./components/RegisterForm";
-import Navbar from "./components/Navbar";
-import UsersDashboard from "./components/UsersDashboard";
 import { StudyPlanResponse, Topic } from "./types";
-import { fetchAllUsers } from "./api";
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: "admin" | "instructor" | "student";
-  active: boolean;
-  password: string;
-};
 
 export function App() {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -28,243 +16,158 @@ export function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [studyPlan, setStudyPlan] = useState<StudyPlanResponse | null>(null);
-  const [page, setPage] = useState<'login' | 'register' | 'main' | 'dashboard'>('main');
+  const [page, setPage] = useState<'login' | 'register' | 'main'>('login');
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [mockUsers, setMockUsers] = useState<User[]>([
-    { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'student', active: true, password: 'pass123' },
-    { id: 2, name: 'Bob Carter', email: 'bob@example.com', role: 'instructor', active: true, password: 'bob123' },
-    { id: 3, name: 'Cara Smith', email: 'cara@example.com', role: 'admin', active: true, password: 'cara123' },
-  ]);
-
-  const mockTopics = [
-    { id: 1, name: 'React', description: 'Componentes, hooks e estado', category: 'Frontend' },
-    { id: 2, name: 'TypeScript', description: 'Tipos sólidos para JavaScript', category: 'Frontend' },
-    { id: 3, name: 'Node.js', description: 'Construção de APIs e microsserviços', category: 'Backend' },
-    { id: 4, name: 'SQL', description: 'Consultas e modelagem de dados', category: 'Database' },
-    { id: 5, name: 'Docker', description: 'Containerização de aplicações', category: 'DevOps' },
-  ];
 
   useEffect(() => {
-    if (!currentUser) {
-      setTopics([]);
-      return;
-    }
-
-    setIsTopicsLoading(true);
-    const timer = setTimeout(() => {
-      setTopics(mockTopics);
-      setIsTopicsLoading(false);
-    }, 250);
-
-    return () => clearTimeout(timer);
-  }, [currentUser]);
-
-  useEffect(() => {
-    if (page !== 'dashboard') return;
-
-    const loadUsers = async () => {
+    if (page !== 'main') return;
+    async function loadTopics() {
       try {
-        const apiUsers = await fetchAllUsers();
-
-        setUsers(apiUsers.map(apiUser => ({
-          id: apiUser.id,
-          name: apiUser.name,
-          email: apiUser.email,
-          role: apiUser.isAdmin ? 'admin' : 'student',
-          active: true,
-          password: ''
-        })));
-      } catch (error: any) {
-        console.error('Failed to fetch users:', error);
-        setUsers(mockUsers); // fallback or keep existing
+        setIsTopicsLoading(true);
+        const response = await fetchTopics();
+        setTopics(response);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to load topics.";
+        setErrorMessage(message);
+      } finally {
+        setIsTopicsLoading(false);
       }
-    };
+    }
+    void loadTopics();
+  }, [page]);
 
-    loadUsers();
-  }, [page, mockUsers]);
-
-  function handleGenerate(values: { prompt: string; weeks: number; hoursPerWeek: number }): Promise<void> {
+  async function handleGenerate(values: { prompt: string; weeks: number; hoursPerWeek: number }) {
     setErrorMessage(null);
     setSuccessMessage(null);
-    setIsGenerating(true);
-
-    const generated = {
-      title: `Plano de estudo: ${values.prompt}`,
-      summary: `Plano de ${values.weeks} semanas com ${values.hoursPerWeek} horas/semana`,
-      weeks: Array.from({ length: values.weeks }, (_, i) => ({
-        week: i + 1,
-        title: `Semana ${i + 1}`,
-        objectives: [
-          `${values.prompt} (foco)`,
-          "Revisão de conceitos chave",
-          "Prática em exercícios específicos"
-        ],
-        topics: selectedTopicIds.length > 0
-          ? selectedTopicIds.map(id => mockTopics.find(t => t.id === id)?.name ?? 'Tópico')
-          : ['Tópico sugerido']
-      }))
-    };
-
-    setStudyPlan(generated);
-    setSuccessMessage("Study plan generated successfully.");
-    setIsGenerating(false);
-
-    return Promise.resolve();
+    try {
+      setIsGenerating(true);
+      const generated = await createStudyPlan({
+        prompt: values.prompt,
+        weeks: values.weeks,
+        hoursPerWeek: values.hoursPerWeek,
+        topicIds: selectedTopicIds.length > 0 ? selectedTopicIds : undefined
+      });
+      setStudyPlan(generated);
+      setSuccessMessage("Study plan generated successfully.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to generate study plan.";
+      setErrorMessage(message);
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   // Real authentication handlers
-  function handleLogin(email: string, password: string) {
+  async function handleLogin(email: string, password: string) {
     setAuthError(null);
-    setAuthSuccess(null);
     setAuthLoading(true);
-
-    const foundUser = mockUsers.find(user => user.email.toLowerCase() === email.toLowerCase() && user.password === password);
-    if (!foundUser) {
-      setAuthError("Usuário ou senha inválidos.");
+    try {
+      const result = await loginUser(email, password);
+      if (result.success) {
+        setPage('main');
+      } else {
+        setAuthError('Login failed.');
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Login failed.');
+    } finally {
       setAuthLoading(false);
-      return;
     }
-
-    setCurrentUser(foundUser);
-    setAuthSuccess(`Bem-vindo, ${foundUser.name}!`);
-    setAuthLoading(false);
   }
 
-  function handleRegister(name: string, email: string, password: string) {
+  async function handleRegister(name: string, email: string, password: string) {
     setAuthError(null);
-    setAuthSuccess(null);
     setAuthLoading(true);
-
-    const existing = mockUsers.find(user => user.email.toLowerCase() === email.toLowerCase());
-    if (existing) {
-      setAuthError('Este email já está em uso.');
+    try {
+      const result = await registerUser(name, email, password);
+      if (result.success) {
+        setPage('login');
+      } else {
+        setAuthError('Registration failed.');
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Registration failed.');
+    } finally {
       setAuthLoading(false);
-      return;
     }
-
-    const user: User = {
-      id: mockUsers.length + 1,
-      name,
-      email,
-      password,
-      role: 'student',
-      active: true,
-    };
-
-    setMockUsers(prev => [...prev, user]);
-    setAuthSuccess('Conta criada com sucesso! Faça login.');
-    setAuthLoading(false);
   }
 
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-[#f8fafc] flex flex-col">
-      <Navbar
-        user={currentUser}
-        onNavigate={(route) => {
-          if (route === 'login') setPage('login');
-          if (route === 'register') setPage('register');
-          if (route === 'dashboard') setPage('dashboard');
-          if (route === 'main') setPage('main');
-        }}
-        onLogout={() => {
-          setCurrentUser(null);
-          setPage('login');
-          setAuthSuccess('Sessão encerrada.');
-        }}
-      />
-
-      <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-16 flex flex-col gap-8">
-        {errorMessage ? <StatusBanner type="error" message={errorMessage} /> : null}
-        {successMessage ? <StatusBanner type="success" message={successMessage} /> : null}
-        {authSuccess ? <StatusBanner type="success" message={authSuccess} /> : null}
-
-        {page === 'login' ? (
-          <div className="max-w-2xl mx-auto px-4 py-8">
-            <LoginForm onLogin={handleLogin} isLoading={authLoading} error={authError} />
-            <div className="text-center mt-4">
-              <button onClick={() => setPage('register')} className="text-sm text-blue-600">Create account</button>
-              <button onClick={() => setPage('main')} className="ml-4 text-sm text-slate-600">Back</button>
-            </div>
+    <div className="min-h-screen flex bg-gradient-to-tr from-blue-50 to-slate-100">
+      {/* Sidebar */}
+      <aside className="hidden md:flex flex-col w-72 bg-white shadow-2xl px-8 py-10 items-center gap-8 border-r border-slate-200">
+        <div className="flex flex-col items-center gap-2">
+          <div className="rounded-full bg-blue-100 p-4 mb-2">
+            <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path fill="#2563eb" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 3a7 7 0 110 14A7 7 0 0112 5zm0 2a5 5 0 100 10A5 5 0 0012 7z"/></svg>
           </div>
-        ) : page === 'register' ? (
-          <div className="max-w-2xl mx-auto px-4 py-8">
-            <RegisterForm onRegister={handleRegister} isLoading={authLoading} error={authError} />
-            <div className="text-center mt-4">
-              <button onClick={() => setPage('login')} className="text-sm text-blue-600">Have an account? Login</button>
-              <button onClick={() => setPage('main')} className="ml-4 text-sm text-slate-600">Back</button>
-            </div>
-          </div>
-        ) : page === 'dashboard' ? (
-          <UsersDashboard
-            users={users.length > 0 ? users : mockUsers}
-            onAddUser={(userData) => {
-              const nextId = Math.max(...(users.length > 0 ? users.map(u => u.id) : mockUsers.map(u => u.id))) + 1;
-              const newUser = { ...userData, id: nextId };
-              setUsers(prev => [...prev, newUser]);
-              setMockUsers(prev => [...prev, newUser]);
-              setAuthSuccess(`Usuário ${userData.name} adicionado com sucesso.`);
-            }}
-            onUpdateUser={(updated) => {
-              setUsers(prev => prev.map(user => user.id === updated.id ? updated : user));
-              setMockUsers(prev => prev.map(user => user.id === updated.id ? updated : user));
-            }}
-            onDeleteUser={(id) => {
-              setUsers(prev => prev.filter(user => user.id !== id));
-              setMockUsers(prev => prev.filter(user => user.id !== id));
-            }}
-            onBack={() => setPage('main')}
-          />
-        ) : (
-          <div className="space-y-8">
-            <section>
-              <div className="text-center mb-8">
-                <h1 className="text-4xl font-extrabold text-slate-900 mb-2 flex items-center justify-center gap-2">
-                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-100 mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 32 32" className="w-7 h-7 text-blue-700"><path fill="currentColor" d="M16 4L2 10.5l14 6.5 14-6.5L16 4zm0 15.5c-4.5 0-8.5 1.6-8.5 3.5V26h17v-3c0-1.9-4-3.5-8.5-3.5z"/><path fill="#38bdf8" d="M16 21c-4.5 0-8.5 1.6-8.5 3.5V26h17v-1.5c0-1.9-4-3.5-8.5-3.5z"/></svg>
-                  </span>
-                  Study Plan Generator
-                </h1>
-                <p className="text-lg text-slate-500 font-medium mb-2">Transform your learning goals into structured study plans powered by AI</p>
-                <div className="flex flex-wrap items-center justify-center gap-4 text-slate-400 text-sm font-medium mb-4">
-                  <span className="inline-flex items-center gap-1"><svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg> AI-Powered</span>
-                  <span className="inline-flex items-center gap-1"><svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 3v4"/></svg> Week-by-Week</span>
-                  <span className="inline-flex items-center gap-1"><svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20l9-5-9-5-9 5 9 5z"/><path d="M12 12V4"/></svg> Personalized</span>
-                </div>
-              </div>
+          <h1 className="text-2xl font-bold text-blue-700 tracking-tight text-center">AI Study Plan</h1>
+          <p className="text-slate-500 text-center text-sm">Your personal roadmap generator</p>
+        </div>
+        <nav className="flex flex-col gap-2 w-full mt-8">
+          <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='main' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('main')}>Home</button>
+          <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='login' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('login')}>Login</button>
+          <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='register' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('register')}>Register</button>
+        </nav>
+        <div className="flex-1" />
+        <footer className="text-xs text-slate-400 text-center">&copy; {new Date().getFullYear()} StudyPlan AI</footer>
+      </aside>
 
-              <PromptForm
-                isSubmitting={isGenerating}
-                onSubmit={handleGenerate}
-                examples={[
-                  'Create a 12-week study plan to learn full-stack web development',
-                  'I want to master data structures and algorithms in 8 weeks',
-                  'Help me learn machine learning fundamentals in 10 weeks',
-                ]}
-              />
-            </section>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-h-screen">
+        <header className="w-full px-4 py-6 bg-white shadow md:hidden flex flex-col items-center gap-2">
+          <h1 className="text-2xl font-bold text-blue-700 tracking-tight">AI Study Plan</h1>
+          <p className="text-slate-500 text-center text-sm">Your personal roadmap generator</p>
+        </header>
 
-            <div>
-              {isTopicsLoading ? (
-                <section className="rounded-xl border border-slate-200 bg-white/80 p-6 text-center text-slate-500 shadow-sm">Loading topics...</section>
-              ) : (
-                <TopicSelector topics={topics} selectedIds={selectedTopicIds} onChange={setSelectedTopicIds} />
-              )}
+        <div className="flex-1 flex flex-col items-center justify-center px-2 py-8">
+          {page === 'login' && (
+            <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+              <LoginForm onLogin={handleLogin} isLoading={authLoading} error={authError} />
+              <p className="mt-4 text-center text-slate-600">
+                Don&apos;t have an account?{' '}
+                <button type="button" onClick={() => setPage('register')} className="text-blue-600 hover:underline font-medium">
+                  Register
+                </button>
+              </p>
             </div>
-
-            <div>
-              <StudyPlanTimeline data={studyPlan} />
+          )}
+          {page === 'register' && (
+            <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+              <RegisterForm onRegister={handleRegister} isLoading={authLoading} error={authError} />
+              <p className="mt-4 text-center text-slate-600">
+                Already have an account?{' '}
+                <button type="button" onClick={() => setPage('login')} className="text-blue-600 hover:underline font-medium">
+                  Login
+                </button>
+              </p>
             </div>
-          </div>
-        )}
+          )}
+          {page === 'main' && (
+            <div className="w-full max-w-7xl mx-auto py-8 px-2 md:px-8 gap-8 md:gap-12 lg:gap-16 flex-col md:flex-row flex">
+              <aside className="w-full md:w-1/2 flex flex-col gap-6 mb-8 md:mb-0">
+                {errorMessage ? <StatusBanner type="error" message={errorMessage} /> : null}
+                {successMessage ? <StatusBanner type="success" message={successMessage} /> : null}
+                <PromptForm isSubmitting={isGenerating} onSubmit={handleGenerate} />
+                {isTopicsLoading ? (
+                  <section className="bg-white rounded-lg shadow p-6">
+                    <p className="text-slate-500">Loading topics...</p>
+                  </section>
+                ) : (
+                  <TopicSelector
+                    topics={topics}
+                    selectedIds={selectedTopicIds}
+                    onChange={setSelectedTopicIds}
+                  />
+                )}
+              </aside>
+              <section className="w-full md:w-1/2 flex flex-col">
+                <StudyPlanTimeline data={studyPlan} />
+              </section>
+            </div>
+          )}
+        </div>
       </main>
-
-      <footer className="w-full text-center text-slate-400 text-sm py-6 border-t border-slate-100 bg-white/90 mt-10 shadow-sm">&copy; {new Date().getFullYear()} StudyPlan AI</footer>
     </div>
-  </BrowserRouter>
   );
 }

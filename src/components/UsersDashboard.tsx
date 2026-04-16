@@ -4,7 +4,7 @@ type User = {
   id: number;
   name: string;
   email: string;
-  role: "admin" | "instructor" | "student";
+  is_admin: boolean;
   active: boolean;
   password: string;
 };
@@ -22,21 +22,32 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [newRole, setNewRole] = useState<"student" | "instructor" | "admin">("student");
-
+  const [isAdmin, setIsAdmin] = useState(false);
+  
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return users.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.role.toLowerCase().includes(q));
+    return users.filter(
+      (u) =>
+        u.name.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q) ||
+        (u.is_admin ? "admin" : "user").includes(q)
+    );
   }, [users, search]);
 
   function handleAddUser(e: React.FormEvent) {
     e.preventDefault();
     if (!newName || !newEmail || !newPassword) return;
-    onAddUser({ name: newName.trim(), email: newEmail.trim(), password: newPassword, role: newRole, active: true });
+    onAddUser({
+      name: newName.trim(),
+      email: newEmail.trim(),
+      password: newPassword,
+      is_admin: isAdmin,
+      active: true
+    });
     setNewName("");
     setNewEmail("");
     setNewPassword("");
-    setNewRole("student");
+    setIsAdmin(false);
   }
 
   return (
@@ -53,7 +64,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search users by name, email, role"
+          placeholder="Search users by name, email, admin status"
           className="w-full border border-slate-300 rounded-md px-3 py-2"
         />
       </div>
@@ -74,7 +85,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
               <tr key={user.id} className="hover:bg-slate-50">
                 <td className="px-3 py-2 border border-slate-200">{user.name}</td>
                 <td className="px-3 py-2 border border-slate-200">{user.email}</td>
-                <td className="px-3 py-2 border border-slate-200 uppercase tracking-wide text-xs">{user.isAdmin}</td>
+                <td className="px-3 py-2 border border-slate-200 uppercase tracking-wide text-xs">{user.is_admin ? "TRUE" : "FALSE"}</td>
                 <td className="px-3 py-2 border border-slate-200">
                   <span className={`rounded-full px-2 py-1 text-xs ${user.active ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
                     {user.active ? "Active" : "Inactive"}
@@ -101,11 +112,10 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
           <input className="border border-slate-300 rounded-md px-3 py-2" placeholder="Name" value={newName} onChange={e => setNewName(e.target.value)} />
           <input className="border border-slate-300 rounded-md px-3 py-2" placeholder="Email" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} />
           <input className="border border-slate-300 rounded-md px-3 py-2" placeholder="Password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
-          <select className="border border-slate-300 rounded-md px-3 py-2" value={newRole} onChange={e => setNewRole(e.target.value as "student" | "instructor" | "admin")}>
-            <option value="student">Student</option>
-            <option value="instructor">Instructor</option>
-            <option value="admin">Admin</option>
-          </select>
+          <label className="border border-slate-300 rounded-md px-3 py-2 flex items-center gap-2 text-sm text-slate-700">
+            <input type="checkbox" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
+            Is Admin
+          </label>
         </div>
         <button type="submit" className="rounded-md bg-green-600 text-white px-4 py-2 hover:bg-green-700">Add User</button>
       </form>
