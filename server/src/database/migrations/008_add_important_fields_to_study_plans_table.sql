@@ -1,0 +1,6 @@
+ALTER TABLE study_plan
+ADD COLUMN duration_years INT DEFAULT 0,
+ADD COLUMN duration_months INT DEFAULT 0,
+ADD COLUMN duration_days INT DEFAULT 0,
+ADD COLUMN duration_hours INT DEFAULT 0,
+ADD COLUMN is_saved BOOLEAN DEFAULT FALSE

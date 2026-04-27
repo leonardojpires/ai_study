@@ -10,9 +10,14 @@ async function runMigrations() {
     try {
         /* This first line is equivalent to the path of the migrations folder */
         const migrationsDir = path.join(__dirname, "migrations");
-        const files = fs.readdirSync(migrationsDir)
+        const migrationName = process.argv[2];
+        let files = fs.readdirSync(migrationsDir)
             .filter(file => file.endsWith(".sql"))
             .sort();
+
+        if (migrationName) {
+            files = files.filter(file => file === migrationName);
+        }
 
         for (const file of files) {
             const filePath = path.join(migrationsDir, file);
