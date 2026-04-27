@@ -1,43 +1,16 @@
 import { useEffect, useState } from "react";
-import { createStudyPlan, fetchCurrentUser, fetchTopics, loginUser, logoutUser, registerUser } from "./api";
+import { createStudyPlan, fetchCurrentUser, loginUser, logoutUser, registerUser } from "./api";
 import { PromptForm } from "./components/PromptForm";
-import { StatusBanner } from "./components/StatusBanner";
-import { StudyPlanTimeline } from "./components/StudyPlanTimeline";
-import { TopicSelector } from "./components/TopicSelector";
 import { LoginForm } from "./components/LoginForm";
 import { RegisterForm } from "./components/RegisterForm";
-import { StudyPlanResponse, Topic } from "./types";
 
 export function App() {
-  const [topics, setTopics] = useState<Topic[]>([]);
-  const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>([]);
-  const [isTopicsLoading, setIsTopicsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [studyPlan, setStudyPlan] = useState<StudyPlanResponse | null>(null);
-  const [page, setPage] = useState<'login' | 'register' | 'main'>('login');
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    if (page !== 'main') return;
-    async function loadTopics() {
-      try {
-        setIsTopicsLoading(true);
-        const response = await fetchTopics();
-        setTopics(response);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to load topics.";
-        setErrorMessage(message);
-      } finally {
-        setIsTopicsLoading(false);
-      }
-    }
-    void loadTopics();
-  }, [page]);
+  const [page, setPage] = useState<'login' | 'register' | 'main'>('login');
 
   useEffect(() => {
     async function checkSession() {
@@ -69,22 +42,14 @@ export function App() {
     );
   }
 
-  async function handleGenerate(values: { prompt: string; weeks: number; hoursPerWeek: number }) {
-    setErrorMessage(null);
-    setSuccessMessage(null);
+  async function handleGenerate(values: { prompt: string }) {
     try {
       setIsGenerating(true);
-      const generated = await createStudyPlan({
+      await createStudyPlan({
         prompt: values.prompt,
-        weeks: values.weeks,
-        hoursPerWeek: values.hoursPerWeek,
-        topicIds: selectedTopicIds.length > 0 ? selectedTopicIds : undefined
+        weeks: 8,
+        hoursPerWeek: 6,
       });
-      setStudyPlan(generated);
-      setSuccessMessage("Study plan generated successfully.");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to generate study plan.";
-      setErrorMessage(message);
     } finally {
       setIsGenerating(false);
     }
@@ -194,26 +159,8 @@ export function App() {
             </div>
           )}
           {page === 'main' && (
-            <div className="w-full max-w-7xl mx-auto py-8 px-2 md:px-8 gap-8 md:gap-12 lg:gap-16 flex-col md:flex-row flex">
-              <aside className="w-full md:w-1/2 flex flex-col gap-6 mb-8 md:mb-0">
-                {errorMessage ? <StatusBanner type="error" message={errorMessage} /> : null}
-                {successMessage ? <StatusBanner type="success" message={successMessage} /> : null}
-                <PromptForm isSubmitting={isGenerating} onSubmit={handleGenerate} />
-                {isTopicsLoading ? (
-                  <section className="bg-white rounded-lg shadow p-6">
-                    <p className="text-slate-500">Loading topics...</p>
-                  </section>
-                ) : (
-                  <TopicSelector
-                    topics={topics}
-                    selectedIds={selectedTopicIds}
-                    onChange={setSelectedTopicIds}
-                  />
-                )}
-              </aside>
-              <section className="w-full md:w-1/2 flex flex-col">
-                <StudyPlanTimeline data={studyPlan} />
-              </section>
+            <div className="w-full max-w-7xl mx-auto py-8 px-2 md:px-8">
+              <PromptForm isSubmitting={isGenerating} onSubmit={handleGenerate} />
             </div>
           )}
         </div>

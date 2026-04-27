@@ -2,24 +2,18 @@ import { FormEvent, useMemo, useState } from "react";
 
 interface PromptFormProps {
   isSubmitting: boolean;
-  onSubmit: (values: { prompt: string; weeks: number; hoursPerWeek: number }) => Promise<void>;
+  onSubmit: (values: { prompt: string }) => Promise<void>;
   examples?: string[];
 }
 
 export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptFormProps) {
   const [prompt, setPrompt] = useState("");
-  const [weeks, setWeeks] = useState(8);
-  const [hoursPerWeek, setHoursPerWeek] = useState(6);
 
   const charCount = useMemo(() => prompt.length, [prompt]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit({
-      prompt: prompt.trim(),
-      weeks,
-      hoursPerWeek,
-    }).catch((err) => {
+    onSubmit({ prompt: prompt.trim() }).catch((err) => {
       console.error("PromptForm submit error:", err);
     });
   }
@@ -53,32 +47,6 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
               {isSubmitting ? "Generating..." : "Generate Plan"}
             </button>
           </div>
-        </div>
-
-        <div className="mt-6 grid grid-cols-2 gap-4">
-          <label className="flex flex-col">
-            <span className="text-sm text-slate-600 mb-1">Weeks</span>
-            <input
-              type="number"
-              min={1}
-              max={52}
-              value={weeks}
-              onChange={(e) => setWeeks(Number(e.target.value))}
-              className="rounded-full border border-slate-200 px-4 py-3 bg-white"
-            />
-          </label>
-
-          <label className="flex flex-col">
-            <span className="text-sm text-slate-600 mb-1">Hours / Week</span>
-            <input
-              type="number"
-              min={1}
-              max={80}
-              value={hoursPerWeek}
-              onChange={(e) => setHoursPerWeek(Number(e.target.value))}
-              className="rounded-full border border-slate-200 px-4 py-3 bg-white"
-            />
-          </label>
         </div>
 
         {examples.length > 0 && (
