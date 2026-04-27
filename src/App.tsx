@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createStudyPlan, fetchTopics, loginUser, registerUser } from "./api";
+import { createStudyPlan, fetchCurrentUser, fetchTopics, loginUser, registerUser } from "./api";
 import { PromptForm } from "./components/PromptForm";
 import { StatusBanner } from "./components/StatusBanner";
 import { StudyPlanTimeline } from "./components/StudyPlanTimeline";
@@ -19,6 +19,8 @@ export function App() {
   const [page, setPage] = useState<'login' | 'register' | 'main'>('login');
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     if (page !== 'main') return;
@@ -36,6 +38,36 @@ export function App() {
     }
     void loadTopics();
   }, [page]);
+
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const response = await fetchCurrentUser();
+        if (response.success) {
+          setIsAuthenticated(true);
+          setPage('main');
+        } else {
+          setIsAuthenticated(false);
+          setPage('login');
+        }
+      } catch {
+        setIsAuthenticated(false);
+        setPage('login');
+      } finally {
+        setAuthChecked(true);
+      }
+    }
+
+    void checkSession();
+  }, []);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-slate-500">Checking authentication…</p>
+      </div>
+    );
+  }
 
   async function handleGenerate(values: { prompt: string; weeks: number; hoursPerWeek: number }) {
     setErrorMessage(null);
@@ -65,6 +97,7 @@ export function App() {
     try {
       const result = await loginUser(email, password);
       if (result.success) {
+        setIsAuthenticated(true);
         setPage('main');
       } else {
         setAuthError('Login failed.');
@@ -94,7 +127,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-tr from-blue-50 to-slate-100">
+    <div className="min-h-screen flex bg-linear-to-tr from-blue-50 to-slate-100">
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-72 bg-white shadow-2xl px-8 py-10 items-center gap-8 border-r border-slate-200">
         <div className="flex flex-col items-center gap-2">
@@ -106,8 +139,12 @@ export function App() {
         </div>
         <nav className="flex flex-col gap-2 w-full mt-8">
           <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='main' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('main')}>Home</button>
-          <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='login' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('login')}>Login</button>
-          <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='register' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('register')}>Register</button>
+          {!isAuthenticated && (
+            <>
+              <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='login' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('login')}>Login</button>
+              <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='register' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('register')}>Register</button>
+            </>
+          )}
         </nav>
         <div className="flex-1" />
         <footer className="text-xs text-slate-400 text-center">&copy; {new Date().getFullYear()} StudyPlan AI</footer>

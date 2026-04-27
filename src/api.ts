@@ -10,7 +10,7 @@ type AuthResponse = {
   };
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 async function parseJsonResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -40,7 +40,8 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
+    credentials: "include"
   });
 
   return parseJsonResponse<AuthResponse>(response);
@@ -50,12 +51,18 @@ export async function registerUser(name: string, email: string, password: string
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name, email, password })
+    body: JSON.stringify({ name, email, password }),
+    credentials: "include"
   });
 
   return parseJsonResponse<AuthResponse>(response);
+}
+
+export async function fetchCurrentUser(): Promise<AuthResponse> {
+  const respones = await fetch(`${API_BASE_URL}/user/users/me`, { credentials: "include" });
+  return parseJsonResponse<AuthResponse>(respones);
 }
 
 export async function fetchTopics(): Promise<Topic[]> {

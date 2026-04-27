@@ -21,4 +21,12 @@ export class UserService {
 
         return user;
     }
+
+    async getCurrentUser(id: number) {
+        const user = await this.userRepository.getCurrentUser(id);
+
+        if (!user) throw new Error("User not found.");
+
+        return user;
+    }
 }

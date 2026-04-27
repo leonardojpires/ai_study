@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import useIfAuth from "../hooks/auth/useIfAuth";
 
 type UserInfo = {
   name: string
@@ -10,7 +11,12 @@ type Props = {
   onNavigate: (route: 'login'|'register'|'dashboard'|'main') => void
 }
 
-export default function Navbar({ user, onLogout, onNavigate }: Props) {
+export default function Navbar({ user: propUser, onLogout, onNavigate }: Props) {
+  const { user: authUser, isLoading } = useIfAuth();
+  const user = authUser ?? propUser ?? null;
+
+
+
   return (
     <header className="w-full border-b bg-white/80 backdrop-blur-sm">
       <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -25,7 +31,9 @@ export default function Navbar({ user, onLogout, onNavigate }: Props) {
         <nav className="flex items-center gap-3">
           <Link to="/" onClick={() => onNavigate('main')} className="text-sm text-slate-700 hover:text-slate-900 cursor-pointer">Home</Link>
           <Link to="/dashboard" onClick={() => onNavigate('dashboard')} className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">Users Dashboard</Link>
-          {user ? (
+          {isLoading ? (
+            <span className="text-sm text-slate-400">Checking session...</span>
+          ) : user ? (
             <>
               <span className="text-sm text-slate-600">Hi, {user.name}</span>
               <button onClick={onLogout} className="ml-2 px-3 py-1 rounded-md bg-red-600 text-white text-sm hover:bg-red-700 cursor-pointer">Logout</button>
