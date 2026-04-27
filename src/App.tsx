@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createStudyPlan, fetchCurrentUser, fetchTopics, loginUser, registerUser } from "./api";
+import { createStudyPlan, fetchCurrentUser, fetchTopics, loginUser, logoutUser, registerUser } from "./api";
 import { PromptForm } from "./components/PromptForm";
 import { StatusBanner } from "./components/StatusBanner";
 import { StudyPlanTimeline } from "./components/StudyPlanTimeline";
@@ -126,6 +126,17 @@ export function App() {
     }
   }
 
+  async function handleLogout() {
+    try {
+      await logoutUser();
+    } catch {
+      // ignore logout errors
+    } finally {
+      setIsAuthenticated(false);
+      setPage('login');
+    }
+  }
+
   return (
     <div className="min-h-screen flex bg-linear-to-tr from-blue-50 to-slate-100">
       {/* Sidebar */}
@@ -139,11 +150,13 @@ export function App() {
         </div>
         <nav className="flex flex-col gap-2 w-full mt-8">
           <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='main' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('main')}>Home</button>
-          {!isAuthenticated && (
+          {!isAuthenticated ? (
             <>
               <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='login' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('login')}>Login</button>
               <button className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page==='register' ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'}`} onClick={()=>setPage('register')}>Register</button>
             </>
+          ) : (
+            <button className="w-full py-2 rounded-lg text-left px-4 font-medium transition hover:bg-slate-100 text-slate-700" onClick={handleLogout}>Logout</button>
           )}
         </nav>
         <div className="flex-1" />

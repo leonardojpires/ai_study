@@ -70,6 +70,13 @@ export async function fetchTopics(): Promise<Topic[]> {
   return parseJsonResponse<Topic[]>(response);
 }
 
+export async function logoutUser(): Promise<void> {
+  await fetch(`${API_BASE_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include"
+  });
+}
+
 export async function createStudyPlan(payload: StudyPlanRequest): Promise<StudyPlanResponse> {
   const response = await fetch(`${API_BASE_URL}/study-plan`, {
     method: "POST",

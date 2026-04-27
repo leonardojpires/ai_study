@@ -36,7 +36,16 @@ export default function Navbar({ user: propUser, onLogout, onNavigate }: Props) 
           ) : user ? (
             <>
               <span className="text-sm text-slate-600">Hi, {user.name}</span>
-              <button onClick={onLogout} className="ml-2 px-3 py-1 rounded-md bg-red-600 text-white text-sm hover:bg-red-700 cursor-pointer">Logout</button>
+              <Link
+                to="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  onLogout();
+                }}
+                className="ml-2 px-3 py-1 rounded-md bg-red-600 text-white text-sm hover:bg-red-700 cursor-pointer"
+              >
+                Logout
+              </Link>
             </>
           ) : (
             <>

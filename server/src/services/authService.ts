@@ -2,6 +2,7 @@ import { IUserRepository } from "../domains/IUserRepository.js";
 import { User } from "../domains/User.js";
 import bcrypt from 'bcrypt';
 import { buildToken } from "../jwt/jwt_build.js";
+import { Response } from "express";
 
 export class AuthService {
     constructor(private userRepository: IUserRepository) {}
@@ -52,5 +53,15 @@ export class AuthService {
             user,
             token
         }
+    }
+
+    async logout(res: Response) {
+        const cookieName = process.env.COOKIE_NAME || "auth_token";
+        res.clearCookie(cookieName, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            path: "/"
+        });
     }
 }

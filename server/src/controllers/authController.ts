@@ -40,4 +40,14 @@ export class AuthController {
             return res.status(401).json({ message: error.message });
         }
     }
+
+    logout = async (req: Request, res: Response) => {
+        try {
+            await this.authService.logout(res);
+            
+            return res.status(200).json({ success: true });
+        } catch(error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
