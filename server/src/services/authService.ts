@@ -13,7 +13,7 @@ export class AuthService {
         if (password.length < 6) throw new Error("Password must be at least 6 characters.");
 
         const existingUser = await this.userRepository.findByEmail(email);
-        if (existingUser) throw new Error('User already exists.');
+        if (existingUser) throw new Error('This e-mail has already been taken.');
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User(undefined, name, email, hashedPassword, false, new Date(), new Date());

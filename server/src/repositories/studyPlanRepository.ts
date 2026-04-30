@@ -8,7 +8,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
   constructor(private pool: Pool) {}
 
   async create(studyPlan: StudyPlan): Promise<StudyPlan> {
-    if (!studyPlan.user?.id) throw new Error("User not found");
+    if (!studyPlan.user_id) throw new Error("User not found");
 
     // NOTE ON mysql2 `pool.query()` RETURN VALUE:
     //
@@ -36,7 +36,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     const [result, _] = await this.pool.query<ResultSetHeader>(
       "INSERT INTO study_plan (user_id, title, description, duration_hours, duration_days, duration_months, duration_years, is_saved) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
-        studyPlan.user.id,
+        studyPlan.user_id,
         studyPlan.title,
         studyPlan.description,
         studyPlan.duration_hours,

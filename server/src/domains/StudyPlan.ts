@@ -1,4 +1,3 @@
-import { User } from "./User.js";
 import { CreateStudyPlanDTO } from "../dtos/CreateStudyPlanDTO.js";
 
 type StudyPlanProps = {
@@ -13,7 +12,7 @@ type StudyPlanProps = {
     duration_months?: number
     duration_years?: number
     is_saved?: boolean
-    user?: User
+    user_id?: number,
 }
 
 export class StudyPlan {
@@ -28,7 +27,7 @@ export class StudyPlan {
     duration_months?: number | undefined;
     duration_years?: number | undefined;
     is_saved?: boolean | undefined;
-    user?: User | undefined;
+    user_id?: number | undefined;
 
     constructor(props: StudyPlanProps) {
         this.id = props.id;
@@ -42,10 +41,10 @@ export class StudyPlan {
         this.duration_months = props.duration_months;
         this.duration_years = props.duration_years;
         this.is_saved = props.is_saved;
-        this.user = props.user;
+        this.user_id = props.user_id;
     }
 
-    static generate(dto: CreateStudyPlanDTO, user: User): StudyPlan { 
+    static generate(dto: CreateStudyPlanDTO, userId: number): StudyPlan { 
         return new StudyPlan({
             title: dto.title,
             description: dto.description ?? "",
@@ -55,24 +54,7 @@ export class StudyPlan {
             duration_months: dto.duration_months ?? 0,
             duration_years: dto.duration_years ?? 0,
             is_saved: dto.is_saved ?? false,
-            user
+            user_id: userId
         });
     }
-
-    // static save(id: number, is_saved: boolean, user: User): StudyPlan {
-    //     return new StudyPlan(
-    //         {
-    //             id,
-    //             title: "",
-    //             description: "",
-    //             duration_hours: 0,
-    //             duration_days: 0,
-    //             duration_weeks: 0,
-    //             duration_months: 0,
-    //             duration_years: 0,
-    //             is_saved,
-    //             user
-    //         }
-    //     );
-    // }
 }

@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { AuthService } from "../services/authService.js";
 import { buildCookieOptions } from "../jwt/jwt_build.js";
 
+type AuthenticatedRequest = Request & { user?: { sub?: number } }
+
 const COOKIE_NAME = process.env.COOKIE_NAME || "";
 
 const cookieOptions = buildCookieOptions();
@@ -43,9 +45,15 @@ export class AuthController {
 
     logout = async (req: Request, res: Response) => {
         try {
+
             await this.authService.logout(res);
             
-            return res.status(200).json({ success: true });
+            res.clearCookie(COOKIE_NAME);
+
+            return res.status(200).json({
+                message: "Logged out successfully.", 
+                success: true 
+            });
         } catch(error: any) {
             res.status(500).json({ message: error.message });
         }
