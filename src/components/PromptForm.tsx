@@ -6,6 +6,7 @@ interface PromptFormProps {
   examples?: string[];
 }
 
+
 export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptFormProps) {
   const [prompt, setPrompt] = useState("");
 
@@ -44,7 +45,7 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
               disabled={isSubmitting}
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 disabled:opacity-60 font-semibold text-base transition"
             >
-              {isSubmitting ? "Generating..." : "Generate Plan"}
+              {isSubmitting ? "Sending..." : "Send"}
             </button>
           </div>
         </div>

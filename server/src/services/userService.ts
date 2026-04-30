@@ -1,8 +1,5 @@
 import { UserRepository } from "../repositories/userRepository.js";
 
-
-
-
 export class UserService {
     constructor(private userRepository: UserRepository) {}
 

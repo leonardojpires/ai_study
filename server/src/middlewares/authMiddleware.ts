@@ -21,7 +21,6 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
         next();
     } catch(err) {
         return res.status(403).json({
-
             message: "Forbidden. Invalid or expired token.",
         })
     }

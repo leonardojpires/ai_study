@@ -3,6 +3,7 @@ import cors from "cors";
 import authRouter from "./routes/authRoutes.js";
 import userRouter from './routes/userRoutes.js';
 import cookieParser from "cookie-parser";
+import studyPlanRouter from "./routes/studyPlanRoutes.js";
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.get("/health", (req, res) => {
 
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
+app.use("/study-plan", studyPlanRouter);
 
 export default app;

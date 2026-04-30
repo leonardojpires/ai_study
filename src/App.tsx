@@ -1,16 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createStudyPlan, fetchCurrentUser, loginUser, logoutUser, registerUser } from "./api";
 import { PromptForm } from "./components/PromptForm";
 import { LoginForm } from "./components/LoginForm";
 import { RegisterForm } from "./components/RegisterForm";
 
+type Message = {
+  role: 'assistant' | 'user';
+  text: string;
+};
+
 export function App() {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: 'assistant',
+      text: 'Hello! I am the study assistant powered by Groq AI. Tell me what you want to learn and I will create a study plan for you.',
+    },
+  ]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState<'login' | 'register' | 'main'>('login');
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [messages]);
 
   useEffect(() => {
     async function checkSession() {
@@ -43,6 +59,10 @@ export function App() {
   }
 
   async function handleGenerate(values: { prompt: string }) {
+    const userMessage: Message = { role: 'user', text: values.prompt };
+    const loadingMessage: Message = { role: 'assistant', text: 'Creating your study plan with Groq AI…' };
+    setMessages((prev) => [...prev, userMessage, loadingMessage]);
+
     try {
       setIsGenerating(true);
       await createStudyPlan({
@@ -50,6 +70,15 @@ export function App() {
         weeks: 8,
         hoursPerWeek: 6,
       });
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
+        { role: 'assistant', text: 'Your study plan has been generated successfully with Groq AI. Check the results when you are ready.' },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
+        { role: 'assistant', text: 'Failed to generate the study plan. Please try again.' },
+      ]);
     } finally {
       setIsGenerating(false);
     }
@@ -101,7 +130,6 @@ export function App() {
       setPage('login');
     }
   }
-
   return (
     <div className="min-h-screen flex bg-linear-to-tr from-blue-50 to-slate-100">
       {/* Sidebar */}
@@ -135,7 +163,7 @@ export function App() {
           <p className="text-slate-500 text-center text-sm">Your personal roadmap generator</p>
         </header>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-2 py-8">
+        <div className="flex-1 flex flex-col items-center justify-start px-2 py-8">
           {page === 'login' && (
             <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
               <LoginForm onLogin={handleLogin} isLoading={authLoading} error={authError} />
@@ -160,7 +188,29 @@ export function App() {
           )}
           {page === 'main' && (
             <div className="w-full max-w-7xl mx-auto py-8 px-2 md:px-8">
-              <PromptForm isSubmitting={isGenerating} onSubmit={handleGenerate} />
+              <div className="flex h-[calc(100vh-7rem)] min-h-[calc(100vh-7rem)] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 shadow-inner">
+                <div className="border-b border-slate-200 px-6 py-5">
+                  <h2 className="text-xl font-semibold text-slate-900">AI Study Plan Chat</h2>
+                  <p className="text-sm text-slate-500">Chat with the assistant and generate your study plan like a chatbot.</p>
+                </div>  
+                <div className="flex-1 overflow-y-auto px-6 py-6">
+                  <div className="flex flex-col gap-4">
+                    {messages.map((message, index) => (
+                      <div
+                        key={index}
+                        className={`max-w-3xl ${message.role === 'assistant' ? 'self-start bg-white text-slate-900 rounded-br-[2rem] rounded-tl-[2rem] rounded-tr-xl border border-slate-200 px-5 py-4 shadow-sm' : 'self-end bg-blue-600 text-white rounded-bl-[2rem] rounded-tr-[2rem] rounded-tl-xl px-5 py-4 shadow-sm'}`}
+                      >
+                        <p className="text-sm leading-6 whitespace-pre-line">{message.text}</p>
+                      </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200 px-6 py-6">
+                  <PromptForm isSubmitting={isGenerating} onSubmit={handleGenerate} />
+                </div>
+              </div>
             </div>
           )}
         </div>

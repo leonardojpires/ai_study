@@ -4,7 +4,6 @@ import { UserController } from './../controllers/UserController.js';
 import { UserService } from './../services/userService.js';
 import authenticateToken from "../middlewares/authMiddleware.js";
 
-
 const userRouter = Router();
 
 const userRepository = new UserRepository();

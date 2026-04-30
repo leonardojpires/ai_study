@@ -20,7 +20,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async findById(id: number): Promise<User | null> {
-        const [users]= await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [id]);
+        const [users] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [id]);
 
         const user = users[0];
 
