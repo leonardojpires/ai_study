@@ -1,11 +1,12 @@
 import { ResultSetHeader } from "mysql2";
-import { pool } from "../database/db.js";
+import { Pool } from "mysql2/promise";
+// Use the promise-based Pool type so query() returns a Promise<[result, fields]> tuple instead of a Query stream.
 import { IStudyPlanRepository } from "../domains/IStudyPlanRepository.js";
-import { CreateStudyPlanDTO } from "../dtos/CreateStudyPlanDTO.js";
 import { StudyPlan } from "./../domains/StudyPlan.js";
-import { User } from "./../domains/User.js";
 
 export class StudyPlanRepository implements IStudyPlanRepository {
+  constructor(private pool: Pool) {}
+
   async create(studyPlan: StudyPlan): Promise<StudyPlan> {
     if (!studyPlan.user?.id) throw new Error("User not found");
 
@@ -32,7 +33,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     // - Always provide a generic type to `query()` (e.g., <ResultSetHeader>)
     //   to avoid using `any` and to let TypeScript catch incorrect assumptions.
 
-    const [result, _] = await pool.query<ResultSetHeader>(
+    const [result, _] = await this.pool.query<ResultSetHeader>(
       "INSERT INTO study_plan (user_id, title, description, duration_hours, duration_days, duration_months, duration_years, is_saved) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
         studyPlan.user.id,

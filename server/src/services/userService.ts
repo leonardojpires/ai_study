@@ -1,6 +1,7 @@
 import { UserRepository } from "../repositories/userRepository.js";
+import { IUserService } from "./IUserService.js";
 
-export class UserService {
+export class UserService implements IUserService {
     constructor(private userRepository: UserRepository) {}
 
     async getAllUsers() {

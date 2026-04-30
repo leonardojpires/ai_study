@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import { StudyPlanService } from "../services/studyPlanService.js";
 import { UserService } from "../services/userService.js";
 import { User } from "../domains/User.js";
+import { IUserService } from "../services/IUserService.js";
 
 type AuthenticatedRequest = Request & { user?: { sub?: number } };
 
 export class StudyPlanController {    
-    constructor(private studyPlanService: StudyPlanService, private userService: UserService) {}
+    constructor(private studyPlanService: StudyPlanService, private userService: IUserService) {}
 
     generate = async (req: Request, res: Response) => {
         try {
