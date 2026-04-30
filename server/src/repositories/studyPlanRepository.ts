@@ -34,13 +34,14 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     //   to avoid using `any` and to let TypeScript catch incorrect assumptions.
 
     const [result, _] = await this.pool.query<ResultSetHeader>(
-      "INSERT INTO study_plan (user_id, title, description, duration_hours, duration_days, duration_months, duration_years, is_saved) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO study_plan (user_id, title, description, duration_hours, duration_days, duration_weeks, duration_months, duration_years, is_saved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         studyPlan.user_id,
         studyPlan.title,
         studyPlan.description,
         studyPlan.duration_hours,
         studyPlan.duration_days,
+        studyPlan.duration_weeks,
         studyPlan.duration_months,
         studyPlan.duration_years,
         studyPlan.is_saved,
