@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createStudyPlan, fetchCurrentUser, loginUser, logoutUser, registerUser } from "./api";
+import { fetchCurrentUser, loginUser, logoutUser, registerUser } from "./api";
 import { PromptForm } from "./components/PromptForm";
 import { LoginForm } from "./components/LoginForm";
 import { RegisterForm } from "./components/RegisterForm";
@@ -60,28 +60,9 @@ export function App() {
 
   async function handleGenerate(values: { prompt: string }) {
     const userMessage: Message = { role: 'user', text: values.prompt };
-    const loadingMessage: Message = { role: 'assistant', text: 'Creating your study plan with Groq AI…' };
-    setMessages((prev) => [...prev, userMessage, loadingMessage]);
+    setMessages((prev) => [...prev, userMessage]);
 
-    try {
-      setIsGenerating(true);
-      await createStudyPlan({
-        prompt: values.prompt,
-        weeks: 8,
-        hoursPerWeek: 6,
-      });
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { role: 'assistant', text: 'Your study plan has been generated successfully with Groq AI. Check the results when you are ready.' },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { role: 'assistant', text: 'Failed to generate the study plan. Please try again.' },
-      ]);
-    } finally {
-      setIsGenerating(false);
-    }
+    // TODO: send the conversation to the Groq backend when the chat API is ready.
   }
 
   // Real authentication handlers
@@ -188,7 +169,7 @@ export function App() {
           )}
           {page === 'main' && (
             <div className="w-full max-w-7xl mx-auto py-8 px-2 md:px-8">
-              <div className="flex h-[calc(100vh-7rem)] min-h-[calc(100vh-7rem)] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 shadow-inner">
+              <div className="flex h-[calc(100vh-6rem)] min-h-[calc(100vh-6rem)] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 shadow-inner">
                 <div className="border-b border-slate-200 px-6 py-5">
                   <h2 className="text-xl font-semibold text-slate-900">AI Study Plan Chat</h2>
                   <p className="text-sm text-slate-500">Chat with the assistant and generate your study plan like a chatbot.</p>

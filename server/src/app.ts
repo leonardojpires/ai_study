@@ -4,6 +4,7 @@ import authRouter from "./routes/authRoutes.js";
 import userRouter from './routes/userRoutes.js';
 import cookieParser from "cookie-parser";
 import studyPlanRouter from "./routes/studyPlanRoutes.js";
+import groqRouter from "./routes/groqRoutes.js";
 
 const app = express();
 
@@ -22,5 +23,6 @@ app.get("/health", (req, res) => {
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/study-plan", studyPlanRouter);
+app.use("/groq", groqRouter);
 
 export default app;
