@@ -10,6 +10,28 @@ type AuthResponse = {
   };
 };
 
+type ChatMessage = {
+  role: "assistant" | "user";
+  text: string;
+};
+
+type GroqResponse = {
+  assistantText: string;
+  ready: boolean;
+  plan?: {
+    title: string;
+    description: string;
+    durationWeeks: number;
+    hoursPerWeek: number;
+    weeks: Array<{
+      week: number;
+      title: string;
+      objectives: string[];
+      topics: string[];
+    }>;
+  };
+};
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 async function parseJsonResponse<T>(response: Response): Promise<T> {
@@ -87,4 +109,16 @@ export async function createStudyPlan(payload: StudyPlanRequest): Promise<StudyP
   });
 
   return parseJsonResponse<StudyPlanResponse>(response);
+}
+
+export async function converse(messages: ChatMessage[]): Promise<GroqResponse> {
+  const response = await fetch(`${API_BASE_URL}/groq/converse`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ messages })
+  });
+
+  return parseJsonResponse<GroqResponse>(response);
 }
