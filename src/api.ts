@@ -29,6 +29,7 @@ type GroqResponse = {
       objectives: string[];
       topics: string[];
     }>;
+  ready: boolean
   };
 };
 

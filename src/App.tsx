@@ -7,6 +7,7 @@ import { RegisterForm } from "./components/RegisterForm";
 type Message = {
   role: 'assistant' | 'user';
   text: string;
+  ready: boolean;
 };
 
 export function App() {
@@ -14,6 +15,7 @@ export function App() {
     {
       role: 'assistant',
       text: 'Hello! I am the study assistant powered by Groq AI. Tell me what you want to learn and I will create a study plan for you.',
+      ready: false
     },
   ]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -59,7 +61,7 @@ export function App() {
   }
 
   async function handleGenerate(values: { prompt: string }) {
-    const userMessage: Message = { role: 'user', text: values.prompt };
+    const userMessage: Message = { role: 'user', text: values.prompt, ready: false };
     setMessages((prev) => [...prev, userMessage]);
     setIsGenerating(true);
 
@@ -68,7 +70,7 @@ export function App() {
 
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', text: result.assistantText },
+        { role: 'assistant', text: result.assistantText, ready: result.ready },
       ]);
 
       if (result.ready) {
@@ -78,7 +80,7 @@ export function App() {
     } catch(error: any) {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', text: error.message || 'Something went wrong.' },
+        { role: 'assistant', text: error.message || 'Something went wrong.', ready: false },
       ]);
     } finally {
       setIsGenerating(false);
@@ -205,6 +207,7 @@ export function App() {
                           className={`max-w-3xl ${message.role === 'assistant' ? 'self-start bg-white text-slate-900 rounded-[1.5rem] rounded-br-none border border-slate-200 px-5 py-4 shadow-sm' : 'self-end bg-blue-600 text-white rounded-[1.5rem] rounded-bl-none px-5 py-4 shadow-sm'}`}
                         >
                           <p className="text-sm leading-6 whitespace-pre-line">{message.text}</p>
+                          <span className="mt-2 text-xs text-slate-400">Ready: { message.ready ? 'Yes' : 'No' }</span>
                         </div>
                       ))}
                       <div ref={messagesEndRef} />

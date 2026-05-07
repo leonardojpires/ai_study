@@ -17,6 +17,14 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
     onSubmit({ prompt: prompt.trim() }).catch((err) => {
       console.error("PromptForm submit error:", err);
     });
+    setPrompt("");
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSubmit(event as unknown as FormEvent<HTMLFormElement>);
+    }
   }
 
   function applyExample(example: string) {
@@ -30,12 +38,11 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
           aria-label="Study plan prompt"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Type your message..."
           rows={1}
           className="flex-1 min-h-[48px] max-h-32 w-full resize-none bg-transparent text-base leading-6 placeholder:text-slate-400 focus:outline-none"
           required
-          minLength={3}
-          maxLength={500}
         />
         <button
           type="submit"
