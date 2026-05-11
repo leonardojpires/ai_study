@@ -1,16 +1,16 @@
-export interface CreateStudyPlanWeekTopicDTO {
-    topic: string;
-}
+// export interface CreateStudyPlanWeekTopicDTO {
+//     topic: string;
+// }
 
-export interface CreateStudyPlanWeekObjectiveDTO {
-    objective: string;
-}
+// export interface CreateStudyPlanWeekObjectiveDTO {
+//     objective: string;
+// }
 
 export interface CreateStudyPlanWeekDTO {
     week_number: number;
     title: string;
-    objectives: CreateStudyPlanWeekObjectiveDTO[];
-    topics: CreateStudyPlanWeekTopicDTO[];
+    objectives: string[];
+    topics: string[];
 }
 
 export interface CreateStudyPlanDTO {

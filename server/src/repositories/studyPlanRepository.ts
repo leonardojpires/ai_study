@@ -8,6 +8,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
   constructor(private pool: Pool) {}
 
   async create(studyPlan: StudyPlan): Promise<StudyPlan> {
+    const conn = await this.pool.getConnection();
     if (!studyPlan.user_id) throw new Error("User not found");
 
     // NOTE ON mysql2 `pool.query()` RETURN VALUE:
@@ -33,18 +34,64 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     // - Always provide a generic type to `query()` (e.g., <ResultSetHeader>)
     //   to avoid using `any` and to let TypeScript catch incorrect assumptions.
 
-    const [result, _] = await this.pool.query<ResultSetHeader>(
-      "INSERT INTO study_plan (user_id, title, description, duration_hours, duration_days, duration_weeks, duration_months, duration_years, is_saved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [
-        studyPlan.user_id,
-        studyPlan.title,
-        studyPlan.description,
-        studyPlan.is_saved,
-      ],
-    );
+    try {
+      await conn.beginTransaction();
 
-    studyPlan.id = result.insertId;
+      const [result, _] = await conn.query<ResultSetHeader>(
+        "INSERT INTO study_plans (user_id, title, description, is_saved) VALUES (?, ?, ?, ?)",
+        [
+          studyPlan.user_id,
+          studyPlan.title,
+          studyPlan.description,
+          studyPlan.is_saved,
+        ],
+      );
 
-    return studyPlan;
+      studyPlan.id = result.insertId;
+
+      for (const week of studyPlan.weeks) {
+        const [weekResult] = await conn.query<ResultSetHeader>(
+          "INSERT INTO study_plans_weeks (study_plan_id, week_number, title) VALUES (?, ?, ?)",
+          [studyPlan.id, week.week_number, week.title]
+        );
+
+        const weekId = weekResult.insertId;
+
+        if (week.objectives.length) {
+          const objectiveRows = week.objectives.map((objective) => {
+            return [
+              weekId, 
+              objective
+            ];
+          });
+          await conn.query(
+            "INSERT INTO study_plans_week_objectives (study_plan_week_id, objective) VALUES ?",
+            [objectiveRows]
+          );
+        }
+
+        if (week.topics.length) {
+          const topicRows = week.topics.map((topic) => {
+            return [
+              weekId, 
+              topic
+            ];
+          });
+
+          await conn.query(
+            "INSERT INTO study_plans_week_topics (study_plan_week_id, topic) VALUES ?",
+            [topicRows]
+          );
+        }
+      }
+
+      await conn.commit();
+      return studyPlan;
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
   }
 }

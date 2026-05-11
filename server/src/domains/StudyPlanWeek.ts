@@ -6,8 +6,8 @@ type StudyPlanWeekProps = {
     study_plan_id?: number;
     week_number: number;
     title: string;
-    objectives: StudyPlanWeekObjective[];
-    topics: StudyPlanWeekTopic[];
+    objectives: string[];
+    topics: string[];
 }
 
 export class StudyPlanWeek {
@@ -15,8 +15,8 @@ export class StudyPlanWeek {
     study_plan_id?: number | undefined;
     week_number: number;
     title: string;
-    objectives: StudyPlanWeekObjective[];
-    topics: StudyPlanWeekTopic[];
+    objectives: string[];
+    topics: string[];
 
     constructor(props: StudyPlanWeekProps) {
         this.id = props.id;

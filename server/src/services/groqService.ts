@@ -1,27 +1,28 @@
 import Groq from "groq-sdk";
+import { CreateStudyPlanDTO } from "../dtos/StudyPlanDTO.js";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || "",
 });
 
-interface GroqStudyPlanDTO {
-  title: string;
-  description: string;
-  duration_hours: number;
-  weeks: Array<{
-    week: number;
-    title: string;
-    objectives: string[];
-    topics: string[];
-  }>;
-  durationWeeks: number;
-  hoursPerWeek: number;
-}
+// interface GroqStudyPlanDTO {
+//   title: string;
+//   description: string;
+//   duration_hours: number;
+//   weeks: Array<{
+//     week: number;
+//     title: string;
+//     objectives: string[];
+//     topics: string[];
+//   }>;
+//   durationWeeks: number;
+//   hoursPerWeek: number;
+// }
 
 interface GroqConversationResult {
   assistantText: string;
   ready: boolean;
-  plan?: GroqStudyPlanDTO;
+  plan?: CreateStudyPlanDTO;
 }
 
 type ChatMessage = {
@@ -37,19 +38,18 @@ export default class GroqService {
       "Do not create the plan until you have all required details.",
       "When you are ready, respond with only valid JSON using this schema:",
       `{
-        "title": string,
-        "description": string,
-        "durationWeeks": number,
-        "hoursPerWeek": number,
+        "title": "string",
+        "description": "string",
         "weeks": [
-            {
-            "week": number,
-            "title": string,
-            "objectives": string[],
-            "topics": string[]
-            }
-        ]
-        }`,
+          {
+            "week_number": 1,
+            "title": "string",
+            "objectives": ["string"],
+            "topics": ["string"]
+          }
+        ],
+        "is_saved": false
+      }`,
       "If you are not ready, reply with a follow-up question.",
       "",
     ];
@@ -76,14 +76,12 @@ export default class GroqService {
     return match ? match[0] : null;
   }
 
-  private validatePlan(candidate: GroqStudyPlanDTO): boolean {
+  private validatePlan(candidate: CreateStudyPlanDTO): boolean {
     if (
       typeof candidate !== "object" ||
       candidate === null ||
       typeof candidate.title !== "string" ||
       typeof candidate.description !== "string" ||
-      typeof candidate.durationWeeks !== "number" ||
-      typeof candidate.hoursPerWeek !== "number" ||
       !Array.isArray(candidate.weeks) ||
       candidate.weeks.length === 0
     ) {
@@ -93,7 +91,7 @@ export default class GroqService {
     return candidate.weeks.every((week) => {
       return (
         typeof week === "object" &&
-        typeof week.week === "number" &&
+        typeof week.week_number === "number" &&
         typeof week.title === "string" &&
         Array.isArray(week.objectives) &&
         week.objectives.every((objective) => typeof objective === "string") &&
@@ -103,7 +101,7 @@ export default class GroqService {
     });
   }
 
-private tryParsePlan(text: string): GroqStudyPlanDTO | null {
+  private tryParsePlan(text: string): CreateStudyPlanDTO | null {
     const json = this.extractJson(text);
     if (!json) return null;
 
@@ -116,21 +114,21 @@ private tryParsePlan(text: string): GroqStudyPlanDTO | null {
   }
 
   async converse(messages: ChatMessage[]): Promise<GroqConversationResult> {
-      const prompt = this.buildPrompt(messages);
-      const assistantText = await this.callGroq(prompt);
-      const plan = this.tryParsePlan(assistantText);
+    const prompt = this.buildPrompt(messages);
+    const assistantText = await this.callGroq(prompt);
+    const plan = this.tryParsePlan(assistantText);
 
-      if (plan) {
-        return {
-            assistantText,
-            ready: true,
-            plan,
-        }
-      }
-
+    if (plan) {
       return {
         assistantText,
-        ready: false
-      }
+        ready: true,
+        plan,
+      };
+    }
+
+    return {
+      assistantText,
+      ready: false,
+    };
   }
 }
