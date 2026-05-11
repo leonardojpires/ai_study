@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS prerequisites, study_plans_topics, topics;

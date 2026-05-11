@@ -39,11 +39,6 @@ export class StudyPlanRepository implements IStudyPlanRepository {
         studyPlan.user_id,
         studyPlan.title,
         studyPlan.description,
-        studyPlan.duration_hours,
-        studyPlan.duration_days,
-        studyPlan.duration_weeks,
-        studyPlan.duration_months,
-        studyPlan.duration_years,
         studyPlan.is_saved,
       ],
     );

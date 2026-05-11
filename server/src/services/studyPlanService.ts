@@ -1,6 +1,6 @@
 import { IStudyPlanRepository } from "../domains/IStudyPlanRepository.js";
 import { StudyPlan } from "../domains/StudyPlan.js";
-import { CreateStudyPlanDTO } from "../dtos/CreateStudyPlanDTO.js";
+import { CreateStudyPlanDTO } from "../dtos/StudyPlanDTO.js";
 
 export class StudyPlanService {
     constructor(private studyPlanRepository: IStudyPlanRepository) {}
