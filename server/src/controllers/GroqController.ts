@@ -57,7 +57,7 @@ export class GroqController {
     return true;
   };
 
-  /* MAIN METHODS */
+  /* -- MAIN METHODS -- */
   converse = async (req: Request, res: Response) => {
     try {
       const authReq = req as AuthenticatedRequest;
@@ -77,15 +77,14 @@ export class GroqController {
 
       if (result.ready && result.plan) {
         if (!this.isValidStudyPlanPayload(result.plan)) {
-          return res.status(422).json({ message: "Groq returned invalid plan data." });
+          return res
+            .status(422)
+            .json({ message: "Groq returned invalid plan data." });
         }
-
-        const studyPlan = await this.studyPlanService.generate(result.plan, userId);
 
         return res.status(200).json({
           ...result,
-          studyPlan
-        })
+        });
       }
 
       return res.status(200).json(result);
@@ -96,32 +95,27 @@ export class GroqController {
     }
   };
 
-  // persist = async (req: Request, res: Response) => {
-  //   try {
-  //     const authReq = req as AuthenticatedRequest;
-
-  //     const userId = authReq.user?.sub;
-  //     if (!userId) return res.status(401).json({ message: "Unauthorized." });
-
-  //     const payload = req.body;
-
-  //     if (!this.isValidStudyPlanPayload(payload)) {
-  //       return res.status(400).json({
-  //         message: "Invalid study plan payload.",
-  //       });
-  //     }
-
-  //     const studyPlan = await this.studyPlanService.generate(payload, userId);
-
-  //     return res.status(201).json({
-  //       message: "Study plan persisted successfully in the database.",
-  //       success: true,
-  //       studyPlan,
-  //     });
-  //   } catch (error: any) {
-  //     return res.status(500).json({
-  //       message: error?.message ?? "Failed to persist study plan with Groq",
-  //     });
-  //   }
-  // };
+  persist = async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const userId = authReq.user?.sub;
+      if (!userId) return res.status(401).json({ message: "Unauthorized." });
+      const payload = req.body;
+      if (!this.isValidStudyPlanPayload(payload)) {
+        return res.status(400).json({
+          message: "Invalid study plan payload.",
+        });
+      }
+      const studyPlan = await this.studyPlanService.generate(payload, userId);
+      return res.status(201).json({
+        message: "Study plan persisted successfully in the database.",
+        success: true,
+        studyPlan,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: error?.message ?? "Failed to persist study plan with Groq",
+      });
+    }
+  };
 }

@@ -24,7 +24,7 @@ type GroqResponse = {
     durationWeeks: number;
     hoursPerWeek: number;
     weeks: Array<{
-      week: number;
+      week_number: number;
       title: string;
       objectives: string[];
       topics: string[];
