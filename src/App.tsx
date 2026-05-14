@@ -94,9 +94,13 @@ export function App() {
     try {
       const result = await converse([...messages, userMessage]);
 
+      const assistantText = result.ready && result.plan
+        ? `Groq generated a study plan recommendation titled “${result.plan.title}”. Review the preview below and save it if you like.`
+        : result.assistantText;
+
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", text: result.assistantText, ready: result.ready },
+        { role: "assistant", text: assistantText, ready: result.ready },
       ]);
 
       if (result.ready && result.plan) {
@@ -134,7 +138,6 @@ export function App() {
       });
 
       setIsPlanSaved(true);
-      setPlanPreview(null);
     } catch (error) {
       throw new Error("Failed to save plan.");
     }
@@ -328,6 +331,48 @@ export function App() {
                           <span className="mt-2 text-xs text-slate-400">
                             Ready: {message.ready ? "Yes" : "No"}
                           </span>
+
+                          {message.role === "assistant" && message.ready && planPreview && index === messages.length - 1 && (
+                            <div className="mt-4 rounded-[1.25rem] border border-slate-100 bg-white px-4 py-4 shadow-none">
+                              <div className="space-y-3 text-sm text-slate-700">
+                                <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                                  <p className="text-sm font-semibold text-slate-900">{planPreview.title}</p>
+                                  {planPreview.description && (
+                                    <p className="mt-2 text-sm leading-6 text-slate-600">{planPreview.description}</p>
+                                  )}
+                                </div>
+
+                                <div className="space-y-3">
+                                  {planPreview.weeks.map((week) => (
+                                    <div key={week.week_number} className="rounded-2xl border border-slate-100 bg-white p-3">
+                                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                        <p className="text-sm font-semibold text-slate-900">Week {week.week_number}</p>
+                                        <span className="text-xs text-slate-500">{week.title}</span>
+                                      </div>
+                                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                        <div>
+                                          <p className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Objectives</p>
+                                          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-slate-700">
+                                            {week.objectives.map((objective) => (
+                                              <li key={objective}>{objective}</li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                        <div>
+                                          <p className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Topics</p>
+                                          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-slate-700">
+                                            {week.topics.map((topic) => (
+                                              <li key={topic}>{topic}</li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                       <div ref={messagesEndRef} />
