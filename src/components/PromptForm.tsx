@@ -47,7 +47,7 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center justify-center bg-blue-600 text-white px-5 py-3 rounded-full shadow hover:bg-blue-700 disabled:opacity-60 font-semibold text-sm transition"
+          className="inline-flex items-center justify-center bg-blue-600 text-white px-5 py-3 rounded-full shadow hover:bg-blue-700 disabled:opacity-60 font-semibold text-sm transition cursor-pointer"
         >
           {isSubmitting ? "Sending..." : "Send"}
         </button>
@@ -55,7 +55,7 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
       <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
         <span>{charCount} characters</span>
         {examples.length > 0 && (
-          <button type="button" onClick={() => applyExample(examples[0])} className="text-blue-600 hover:underline">
+          <button type="button" onClick={() => applyExample(examples[0])} className="text-blue-600 hover:underline cursor-pointer">
             Try an example
           </button>
         )}

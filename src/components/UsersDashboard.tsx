@@ -57,7 +57,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
           <h2 className="text-xl font-bold">Users Dashboard</h2>
           <p className="text-sm text-slate-500">Manage user accounts with mocked data (no backend calls).</p>
         </div>
-        <button onClick={onBack} className="rounded-md px-3 py-1 bg-slate-100 text-slate-700 text-sm hover:bg-slate-200">Back to app</button>
+        <button onClick={onBack} className="rounded-md px-3 py-1 bg-slate-100 text-slate-700 text-sm hover:bg-slate-200 cursor-pointer">Back to app</button>
       </div>
 
       <div className="mb-6">
@@ -117,7 +117,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
             Is Admin
           </label>
         </div>
-        <button type="submit" className="rounded-md bg-green-600 text-white px-4 py-2 hover:bg-green-700">Add User</button>
+        <button type="submit" className="rounded-md bg-green-600 text-white px-4 py-2 hover:bg-green-700 cursor-pointer">Add User</button>
       </form>
     </section>
   );

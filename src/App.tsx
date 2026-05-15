@@ -17,6 +17,13 @@ type Message = {
   ready: boolean;
 };
 
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+}
+
 export function App() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -44,6 +51,8 @@ export function App() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState<"login" | "register" | "main">("login");
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -60,6 +69,7 @@ export function App() {
         if (response.success) {
           setIsAuthenticated(true);
           setPage("main");
+          setUser(response.user);
         } else {
           setIsAuthenticated(false);
           setPage("login");
@@ -224,36 +234,86 @@ export function App() {
           </p>
         </div>
         <nav className="flex flex-col gap-2 w-full mt-8">
-          <button
-            className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page === "main" ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100 text-slate-700"}`}
-            onClick={() => setPage("main")}
-          >
-            Home
-          </button>
-          {!isAuthenticated ? (
+          {isAuthenticated ? (
             <>
               <button
-                className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page === "login" ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100 text-slate-700"}`}
+                className={`w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer ${page === "main" ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100 text-slate-700"}`}
+                onClick={() => setPage("main")}
+              >
+                Home
+              </button>
+              <button
+                className="w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer hover:bg-slate-100 text-slate-700"
+                type="button"
+              >
+                Guide
+              </button>
+              <button
+                className="w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer hover:bg-slate-100 text-slate-700"
+                type="button"
+              >
+                My Plans
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className={`w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer ${page === "login" ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100 text-slate-700"}`}
                 onClick={() => setPage("login")}
               >
                 Login
               </button>
               <button
-                className={`w-full py-2 rounded-lg text-left px-4 font-medium transition ${page === "register" ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100 text-slate-700"}`}
+                className={`w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer ${page === "register" ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100 text-slate-700"}`}
                 onClick={() => setPage("register")}
               >
                 Register
               </button>
             </>
-          ) : (
-            <button
-              className="w-full py-2 rounded-lg text-left px-4 font-medium transition hover:bg-slate-100 text-slate-700"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
           )}
         </nav>
+
+        {isAuthenticated && (
+          <div className="w-full relative">
+            <button
+              type="button"
+              onClick={() => setProfileMenuOpen((open) => !open)}
+              className="w-full flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition cursor-pointer hover:bg-slate-100"
+            >
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-semibold">
+                U
+              </span>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-slate-900">{ user?.name }</p>
+                <p className="text-xs text-slate-500">Account actions</p>
+              </div>
+              <span className="text-slate-400">▾</span>
+            </button>
+
+            {profileMenuOpen && (
+              <div className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                <button
+                  type="button"
+                  className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  onClick={() => setProfileMenuOpen(false)}
+                >
+                  Profile
+                </button>
+                <button
+                  type="button"
+                  className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  onClick={() => {
+                    setProfileMenuOpen(false);
+                    handleLogout();
+                  }}
+                >
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex-1" />
         <footer className="text-xs text-slate-400 text-center">
           &copy; {new Date().getFullYear()} StudyPlan AI
@@ -284,7 +344,7 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setPage("register")}
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-blue-600 hover:underline font-medium cursor-pointer"
                 >
                   Register
                 </button>
@@ -303,7 +363,7 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setPage("login")}
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-blue-600 hover:underline font-medium cursor-pointer"
                 >
                   Login
                 </button>
@@ -395,14 +455,14 @@ export function App() {
                       <div className="flex flex-col gap-2 sm:flex-row">
                         <button
                           type="button"
-                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition cursor-pointer hover:bg-blue-700"
                           onClick={handleSaveRecommendation}
                         >
                           Save plan
                         </button>
                         <button
                           type="button"
-                          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition cursor-pointer hover:bg-slate-100"
                           onClick={handleTryAgain}
                         >
                           Try again
