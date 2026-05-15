@@ -37,6 +37,7 @@ export function App() {
   }>(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastPrompt, setLastPrompt] = useState<string | null>(null);
   const [isPlanSaved, setIsPlanSaved] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -83,6 +84,7 @@ export function App() {
   }
 
   async function handleGenerate(values: { prompt: string }) {
+    setLastPrompt(values.prompt);
     const userMessage: Message = {
       role: "user",
       text: values.prompt,
@@ -143,9 +145,13 @@ export function App() {
     }
   }
 
-  function handleTryAgain() {
-    // TODO: implement retry logic.
-    console.log("Try again clicked");
+  async function handleTryAgain() {
+    if (!lastPrompt) return;
+
+    setPlanPreview(null);
+    setIsPlanSaved(false);
+
+    await handleGenerate({ prompt: lastPrompt });
   }
 
   const hasReadyPreview = Boolean(planPreview && !isPlanSaved);
@@ -328,9 +334,9 @@ export function App() {
                           <p className="text-sm leading-6 whitespace-pre-line">
                             {message.text}
                           </p>
-                          <span className="mt-2 text-xs text-slate-400">
+                          {/* <span className="mt-2 text-xs text-slate-400">
                             Ready: {message.ready ? "Yes" : "No"}
-                          </span>
+                          </span> */}
 
                           {message.role === "assistant" && message.ready && planPreview && index === messages.length - 1 && (
                             <div className="mt-4 rounded-[1.25rem] border border-slate-100 bg-white px-4 py-4 shadow-none">
