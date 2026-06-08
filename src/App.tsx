@@ -108,7 +108,10 @@ export function App() {
 
       const assistantText = result.ready && result.plan
         ? `Groq generated a study plan recommendation titled “${result.plan.title}”. Review the preview below and save it if you like.`
+        : result.assistantText.trim().startsWith("{")
+        ? "I generated a plan, but it came back in an unexpected format. Please try again."
         : result.assistantText;
+        ;
 
       setMessages((prev) => [
         ...prev,

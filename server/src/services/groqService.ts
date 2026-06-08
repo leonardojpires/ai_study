@@ -34,8 +34,13 @@ export default class GroqService {
   private buildPrompt(messages: ChatMessage[]) {
     const instructions = [
       "You are an expert study-plan assistant.",
+      "Use exactly these field names: title, description, weeks, week_number, title, objectives, topics, is_saved",
+      "Do not use markdown",
+      "Do not wrap the JSON in code fences",
+      "Do not include any explanation outside the JSON",
       "Ask clarifying questions until you have enough information to create a plan.",
       "Do not create the plan until you have all required details.",
+      "You must respond in the same language as the user prompt",
       "When you are ready, respond with only valid JSON using this schema:",
       `{
         "title": "string",
@@ -81,7 +86,7 @@ export default class GroqService {
       typeof candidate !== "object" ||
       candidate === null ||
       typeof candidate.title !== "string" ||
-      typeof candidate.description !== "string" ||
+      typeof candidate.description ==  null ||
       !Array.isArray(candidate.weeks) ||
       candidate.weeks.length === 0
     ) {
@@ -120,7 +125,7 @@ export default class GroqService {
 
     if (plan) {
       return {
-        assistantText,
+        assistantText: `Study plan generated: ${plan.title}`,
         ready: true,
         plan,
       };

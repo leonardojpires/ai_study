@@ -21,8 +21,6 @@ type GroqResponse = {
   plan?: {
     title: string;
     description: string;
-    durationWeeks: number;
-    hoursPerWeek: number;
     weeks: Array<{
       week_number: number;
       title: string;
