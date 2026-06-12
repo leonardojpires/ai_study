@@ -7,3 +7,5 @@ dist
 /server/tests/
 /tests/
 server/tests/auth.test.ts
+
+/server/src/scripts
