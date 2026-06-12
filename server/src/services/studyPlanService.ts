@@ -14,4 +14,12 @@ export class StudyPlanService {
 
         return studyPlan;
     }
+
+    async getPlansByUserId(userId: number) {
+        if (!userId) throw new Error("User not found");
+
+        const studyPlans = await this.studyPlanRepository.getPlansByUserId(userId);
+
+        return studyPlans;
+    }
 }

@@ -275,12 +275,6 @@ export function App() {
                 Home
               </button>
               <button
-                className={`w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer ${page === "profile" ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100 text-slate-700"}`}
-                onClick={() => setPage("profile")}
-              >
-                Profile
-              </button>
-              <button
                 className="w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer hover:bg-slate-100 text-slate-700"
                 type="button"
               >

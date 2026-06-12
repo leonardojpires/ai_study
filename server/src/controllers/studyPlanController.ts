@@ -24,4 +24,22 @@ export class StudyPlanController {
             return res.status(500).json({ message: error.message });
         }
     }
+
+    getPlansByUserId = async (req: Request, res: Response) => {
+        try {
+            const authReq = req as AuthenticatedRequest;
+            const userId = authReq.user?.sub;
+            if (!userId) return res.status(401).json({ message: "Unauthorized." });
+
+            const result = await this.studyPlanService.getPlansByUserId(userId);
+
+            return res.status(201).json({
+                success: true,
+                studyPlan: result
+            });
+
+        } catch(error: any) {
+            return res.status(500).json({ message: error.message })
+        } 
+    }
 }

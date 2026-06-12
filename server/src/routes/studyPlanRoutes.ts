@@ -12,5 +12,6 @@ const studyPlanService = new StudyPlanService(studyPlanRepository);
 const studyPlanController = new StudyPlanController(studyPlanService);
 
 studyPlanRouter.post("/generate", authenticateToken, studyPlanController.generate);
+studyPlanRouter.get("/get-saved-plans", authenticateToken, studyPlanController.getPlansByUserId);
 
 export default studyPlanRouter;

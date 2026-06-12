@@ -1,5 +1,5 @@
 import { ResultSetHeader } from "mysql2";
-import { Pool } from "mysql2/promise";
+import { Pool, RowDataPacket } from "mysql2/promise";
 // Use the promise-based Pool type so query() returns a Promise<[result, fields]> tuple instead of a Query stream.
 import { IStudyPlanRepository } from "../domains/IStudyPlanRepository.js";
 import { StudyPlan } from "./../domains/StudyPlan.js";
@@ -52,35 +52,29 @@ export class StudyPlanRepository implements IStudyPlanRepository {
       for (const week of studyPlan.weeks) {
         const [weekResult] = await conn.query<ResultSetHeader>(
           "INSERT INTO study_plans_weeks (study_plan_id, week_number, title) VALUES (?, ?, ?)",
-          [studyPlan.id, week.week_number, week.title]
+          [studyPlan.id, week.week_number, week.title],
         );
 
         const weekId = weekResult.insertId;
 
         if (week.objectives.length) {
           const objectiveRows = week.objectives.map((objective) => {
-            return [
-              weekId, 
-              objective
-            ];
+            return [weekId, objective];
           });
           await conn.query(
             "INSERT INTO study_plans_week_objectives (study_plan_week_id, objective) VALUES ?",
-            [objectiveRows]
+            [objectiveRows],
           );
         }
 
         if (week.topics.length) {
           const topicRows = week.topics.map((topic) => {
-            return [
-              weekId, 
-              topic
-            ];
+            return [weekId, topic];
           });
 
           await conn.query(
             "INSERT INTO study_plans_week_topics (study_plan_week_id, topic) VALUES ?",
-            [topicRows]
+            [topicRows],
           );
         }
       }
@@ -90,6 +84,24 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     } catch (error) {
       await conn.rollback();
       throw error;
+    } finally {
+      conn.release();
+    }
+  }
+
+  async getPlansByUserId(userId: number): Promise<StudyPlan[]> {
+    const conn = await this.pool.getConnection();
+    try {
+      const [rows] = await conn.query<RowDataPacket[]>(
+        "SELECT * FROM study_plans WHERE user_id = ?",
+        [userId],
+      );
+
+     return rows.map((studyPlanRow) => new StudyPlan({
+      title: studyPlanRow.title,
+      description: studyPlanRow.description,
+      createdAt: studyPlanRow.created_at,
+     }));
     } finally {
       conn.release();
     }
