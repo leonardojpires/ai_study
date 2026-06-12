@@ -10,6 +10,7 @@ import {
 import { PromptForm } from "./components/PromptForm";
 import { LoginForm } from "./components/LoginForm";
 import { RegisterForm } from "./components/RegisterForm";
+import { UserProfile } from "./components/UserProfile";
 
 type Message = {
   role: "assistant" | "user";
@@ -50,9 +51,11 @@ export function App() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [page, setPage] = useState<"login" | "register" | "main">("login");
+  const [page, setPage] = useState<"login" | "register" | "main" | "profile">("login");
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -84,6 +87,30 @@ export function App() {
 
     void checkSession();
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated || page !== "profile") return;
+
+    async function loadProfile() {
+      setProfileLoading(true);
+      setProfileError(null);
+
+      try {
+        const response = await fetchCurrentUser();
+        if (response.success) {
+          setUser(response.user);
+        } else {
+          setProfileError("Could not load your profile information.");
+        }
+      } catch (error: any) {
+        setProfileError(error.message || "Could not load your profile information.");
+      } finally {
+        setProfileLoading(false);
+      }
+    }
+
+    void loadProfile();
+  }, [isAuthenticated, page]);
 
   if (!authChecked) {
     return (
@@ -178,6 +205,7 @@ export function App() {
       if (result.success) {
         setIsAuthenticated(true);
         setPage("main");
+        setUser(result.user);
       } else {
         setAuthError("Login failed.");
       }
@@ -213,6 +241,7 @@ export function App() {
     } finally {
       setIsAuthenticated(false);
       setPage("login");
+      setUser(null);
     }
   }
 
@@ -246,16 +275,16 @@ export function App() {
                 Home
               </button>
               <button
-                className="w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer hover:bg-slate-100 text-slate-700"
-                type="button"
+                className={`w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer ${page === "profile" ? "bg-blue-100 text-blue-700" : "hover:bg-slate-100 text-slate-700"}`}
+                onClick={() => setPage("profile")}
               >
-                Guide
+                Profile
               </button>
               <button
                 className="w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer hover:bg-slate-100 text-slate-700"
                 type="button"
               >
-                My Plans
+                Guide
               </button>
             </>
           ) : (
@@ -298,7 +327,10 @@ export function App() {
                 <button
                   type="button"
                   className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
-                  onClick={() => setProfileMenuOpen(false)}
+                  onClick={() => {
+                    setProfileMenuOpen(false);
+                    setPage("profile");
+                  }}
                 >
                   Profile
                 </button>
@@ -332,6 +364,24 @@ export function App() {
           <p className="text-slate-500 text-center text-sm">
             Your personal roadmap generator
           </p>
+          {isAuthenticated && (
+            <div className="mt-2 flex w-full max-w-sm gap-2">
+              <button
+                type="button"
+                className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer ${page === "main" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"}`}
+                onClick={() => setPage("main")}
+              >
+                Home
+              </button>
+              <button
+                type="button"
+                className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer ${page === "profile" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"}`}
+                onClick={() => setPage("profile")}
+              >
+                Profile
+              </button>
+            </div>
+          )}
         </header>
 
         <div className="flex-1 flex flex-col items-center justify-start">
@@ -481,6 +531,13 @@ export function App() {
                 </div>
               </div>
             </div>
+          )}
+          {page === "profile" && isAuthenticated && (
+            <UserProfile
+              user={user}
+              isLoading={profileLoading}
+              error={profileError}
+            />
           )}
         </div>
       </main>
