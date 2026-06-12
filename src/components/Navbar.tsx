@@ -14,9 +14,7 @@ type Props = {
 export default function Navbar({ user: propUser, onLogout, onNavigate }: Props) {
   const { user: authUser, isLoading } = useIfAuth();
   const user = authUser ?? propUser ?? null;
-
-
-
+  
   return (
     <header className="w-full border-b bg-white/80 backdrop-blur-sm">
       <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">

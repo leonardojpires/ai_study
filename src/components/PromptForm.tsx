@@ -17,6 +17,14 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
     onSubmit({ prompt: prompt.trim() }).catch((err) => {
       console.error("PromptForm submit error:", err);
     });
+    setPrompt("");
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSubmit(event as unknown as FormEvent<HTMLFormElement>);
+    }
   }
 
   function applyExample(example: string) {
@@ -25,48 +33,31 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="bg-white rounded-2xl shadow-xl p-8">
-        <div className="mb-4">
-          <textarea
-            aria-label="Study plan prompt"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Describe what you want to learn... (e.g., 'Create a 12-week plan to learn web development')"
-            rows={5}
-            className="w-full bg-slate-50 rounded-2xl border border-slate-200 p-5 text-lg resize-none placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-            required
-            minLength={10}
-            maxLength={500}
-          />
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-xs text-slate-400">{charCount} characters</span>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 disabled:opacity-60 font-semibold text-base transition"
-            >
-              {isSubmitting ? "Sending..." : "Send"}
-            </button>
-          </div>
-        </div>
-
+      <div className="bg-white rounded-full border border-slate-200 shadow-sm px-4 py-3 flex items-end gap-3">
+        <textarea
+          aria-label="Study plan prompt"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type your message..."
+          rows={1}
+          className="flex-1 min-h-[48px] max-h-32 w-full resize-none bg-transparent text-base leading-6 placeholder:text-slate-400 focus:outline-none"
+          required
+        />
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="inline-flex items-center justify-center bg-blue-600 text-white px-5 py-3 rounded-full shadow hover:bg-blue-700 disabled:opacity-60 font-semibold text-sm transition cursor-pointer"
+        >
+          {isSubmitting ? "Sending..." : "Send"}
+        </button>
+      </div>
+      <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
+        <span>{charCount} characters</span>
         {examples.length > 0 && (
-          <div className="mt-8">
-            <h3 className="text-sm font-semibold text-slate-500 mb-3">Try these examples:</h3>
-            <div className="flex flex-col gap-2">
-              {examples.map((ex) => (
-                <button
-                  type="button"
-                  key={ex}
-                  onClick={() => applyExample(ex)}
-                  className="w-full text-left px-4 py-3 text-base bg-white hover:bg-blue-50 rounded-xl border border-slate-200 shadow-sm transition"
-                  style={{ boxShadow: '0 1px 4px 0 rgba(16, 23, 22, 0.04)' }}
-                >
-                  {ex}
-                </button>
-              ))}
-            </div>
-          </div>
+          <button type="button" onClick={() => applyExample(examples[0])} className="text-blue-600 hover:underline cursor-pointer">
+            Try an example
+          </button>
         )}
       </div>
     </form>

@@ -1,4 +1,4 @@
-import { StudyPlanRequest, StudyPlanResponse, Topic } from "./types";
+import { StudyPlanRequest, StudyPlanResponse, Topic } from "./types.js";
 
 type AuthResponse = {
   success: boolean;
@@ -7,6 +7,27 @@ type AuthResponse = {
     name: string;
     email: string;
     isAdmin: boolean;
+  };
+};
+
+type ChatMessage = {
+  role: "assistant" | "user";
+  text: string;
+};
+
+type GroqResponse = {
+  assistantText: string;
+  ready: boolean;
+  plan?: {
+    title: string;
+    description: string;
+    weeks: Array<{
+      week_number: number;
+      title: string;
+      objectives: string[];
+      topics: string[];
+    }>;
+    ready: boolean;
   };
 };
 
@@ -34,34 +55,43 @@ async function parseJsonResponse<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-export async function loginUser(email: string, password: string): Promise<AuthResponse> {
+export async function loginUser(
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ email, password }),
-    credentials: "include"
+    credentials: "include",
   });
 
   return parseJsonResponse<AuthResponse>(response);
 }
 
-export async function registerUser(name: string, email: string, password: string): Promise<AuthResponse> {
+export async function registerUser(
+  name: string,
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ name, email, password }),
-    credentials: "include"
+    credentials: "include",
   });
 
   return parseJsonResponse<AuthResponse>(response);
 }
 
 export async function fetchCurrentUser(): Promise<AuthResponse> {
-  const respones = await fetch(`${API_BASE_URL}/user/users/me`, { credentials: "include" });
+  const respones = await fetch(`${API_BASE_URL}/user/users/me`, {
+    credentials: "include",
+  });
   return parseJsonResponse<AuthResponse>(respones);
 }
 
@@ -73,18 +103,54 @@ export async function fetchTopics(): Promise<Topic[]> {
 export async function logoutUser(): Promise<void> {
   await fetch(`${API_BASE_URL}/auth/logout`, {
     method: "POST",
-    credentials: "include"
+    credentials: "include",
   });
 }
 
-export async function createStudyPlan(payload: StudyPlanRequest): Promise<StudyPlanResponse> {
+export async function createStudyPlan(
+  payload: StudyPlanRequest,
+): Promise<StudyPlanResponse> {
   const response = await fetch(`${API_BASE_URL}/study-plan`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 
   return parseJsonResponse<StudyPlanResponse>(response);
 }
+
+export async function converse(messages: ChatMessage[]): Promise<GroqResponse> {
+  const response = await fetch(`${API_BASE_URL}/groq/converse`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ messages }),
+  });
+
+  return parseJsonResponse<GroqResponse>(response);
+}
+
+export async function persistGroqPlan(plan: {
+  title: string;
+  description?: string;
+  weeks: Array<{
+    week_number: number;
+    title: string;
+    objectives: string[];
+    topics: string[];
+  }>;
+  is_saved?: boolean;
+}) {
+  const response = await fetch(`${API_BASE_URL}/groq/persist`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...plan }),
+  });
+
+  return parseJsonResponse(response);
+};

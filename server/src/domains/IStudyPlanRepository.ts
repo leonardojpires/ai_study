@@ -1,4 +1,4 @@
-import { CreateStudyPlanDTO } from "../dtos/CreateStudyPlanDTO.js";
+import { CreateStudyPlanDTO } from "../dtos/StudyPlanDTO.js";
 import { User } from './User.js';
 import { StudyPlan } from './StudyPlan.js';
 
