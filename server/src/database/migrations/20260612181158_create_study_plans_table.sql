@@ -1,14 +1,16 @@
-CREATE TABLE IF NOT EXISTS study_plans_weeks (
+-- Write your SQL queries here
+CREATE TABLE IF NOT EXISTS study_plans (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    study_plan_id INT UNSIGNED NOT NULL,
-    week_number INT NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
     title VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_saved BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_study_plans_weeks_study_plan_id
-        FOREIGN KEY (study_plan_id)
-        REFERENCES study_plans(id)
+    CONSTRAINT fk_study_plans_user_id
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB

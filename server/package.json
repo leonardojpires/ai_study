@@ -8,7 +8,9 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "test": "jest --detectOpenHandles --forceExit",
-    "migrate": "tsx src/database/runMigrations.ts"
+    "migrate:all": "ts-node ./src/scripts/run_migrations.ts all",
+    "migrate:one": "ts-node ./src/scripts/run_migrations.ts one",
+    "create:migration": "ts-node ./src/scripts/create_migration.ts"
   },
   "keywords": [],
   "author": "",
