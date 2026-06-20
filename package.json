@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "cd server && tsx watch src/server.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
@@ -29,6 +30,7 @@
     "supertest": "^7.2.2",
     "tailwindcss": "^4.2.2",
     "ts-jest": "^29.4.6",
+    "tsx": "^4.22.4",
     "typescript": "^5.7.2",
     "vite": "^7.3.1"
   },

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getPlansByUserId } from "../api";
+import { SavedPlan } from "../types";
 
 type UserProfileData = {
   id: number;
@@ -6,41 +8,6 @@ type UserProfileData = {
   email: string;
   isAdmin: boolean;
 };
-
-type SavedPlan = {
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  weeks: number;
-};
-
-const mockSavedPlans: SavedPlan[] = [
-  {
-    id: 1,
-    title: "Master React & TypeScript",
-    description:
-      "Build production-ready React applications with TypeScript, hooks, and modern patterns.",
-    category: "Web Development",
-    weeks: 8,
-  },
-  {
-    id: 2,
-    title: "Data Structures & Algorithms",
-    description:
-      "Deep dive into arrays, trees, graphs, and dynamic programming with weekly problem sets.",
-    category: "Computer Science",
-    weeks: 12,
-  },
-  {
-    id: 3,
-    title: "Introduction to Machine Learning",
-    description:
-      "Learn supervised and unsupervised learning fundamentals with hands-on Python projects.",
-    category: "AI & Data",
-    weeks: 10,
-  },
-];
 
 interface UserProfileProps {
   user: UserProfileData | null;
@@ -57,8 +24,50 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
       .map((part) => part[0]?.toUpperCase())
       .join("") || "U";
 
+  const [plans, setPlans] = useState<SavedPlan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(false);
+  const [plansError, setPlansError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const total = mockSavedPlans.length;
+
+  useEffect(() => {
+    if (isLoading || !user) return;
+
+    let cancelled = false;
+
+    async function loadPlans() {
+      setPlansLoading(true);
+      setPlansError(null);
+
+      try {
+        const response = await getPlansByUserId(user!.id);
+        if (cancelled) return;
+
+        if (response.success) {
+          setPlans(response.plans ?? []);
+          setActiveIndex(0);
+        } else {
+          setPlans([]);
+          setPlansError("Could not load your saved plans.");
+        }
+      } catch (err: any) {
+        if (cancelled) return;
+        setPlans([]);
+        setPlansError(err?.message || "Could not load your saved plans.");
+      } finally {
+        if (!cancelled) {
+          setPlansLoading(false);
+        }
+      }
+    }
+
+    void loadPlans();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, isLoading]);
+
+  const total = plans.length;
   const goPrev = () => setActiveIndex((i) => (i - 1 + total) % total);
   const goNext = () => setActiveIndex((i) => (i + 1) % total);
 
@@ -150,83 +159,113 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
               Browse the study plans you have saved.
             </p>
           </div>
-          <div className="mt-3 flex items-center gap-2 sm:mt-0">
-            <button
-              type="button"
-              onClick={goPrev}
-              aria-label="Previous plan"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition cursor-pointer hover:bg-slate-100"
-            >
-              ‹
-            </button>
-            <span className="text-xs font-semibold text-slate-500">
-              {activeIndex + 1} / {total}
-            </span>
-            <button
-              type="button"
-              onClick={goNext}
-              aria-label="Next plan"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition cursor-pointer hover:bg-slate-100"
-            >
-              ›
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-8 flex-1 overflow-hidden">
-          <div
-            className="flex h-full transition-transform duration-500 ease-out"
-            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-          >
-            {mockSavedPlans.map((plan) => (
-              <article
-                key={plan.id}
-                className="w-full shrink-0 px-1"
+          {total > 1 && (
+            <div className="mt-3 flex items-center gap-2 sm:mt-0">
+              <button
+                type="button"
+                onClick={goPrev}
+                aria-label="Previous plan"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition cursor-pointer hover:bg-slate-100"
               >
-                <div className="flex h-full min-h-[20rem] flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-8">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                    {plan.category}
-                  </p>
-                  <h4 className="break-words text-2xl font-bold text-slate-900">
-                    {plan.title}
-                  </h4>
-                  <p className="text-base leading-7 text-slate-600">
-                    {plan.description}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
-                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1 font-medium">
-                      {plan.weeks} weeks
-                    </span>
-                  </div>
-                  <div className="mt-auto pt-4">
-                    <button
-                      type="button"
-                      className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition cursor-pointer hover:bg-blue-700"
-                    >
-                      View details
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                ‹
+              </button>
+              <span className="text-xs font-semibold text-slate-500">
+                {activeIndex + 1} / {total}
+              </span>
+              <button
+                type="button"
+                onClick={goNext}
+                aria-label="Next plan"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition cursor-pointer hover:bg-slate-100"
+              >
+                ›
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-2">
-          {mockSavedPlans.map((plan, index) => (
-            <button
-              key={plan.id}
-              type="button"
-              onClick={() => setActiveIndex(index)}
-              aria-label={`Go to plan ${index + 1}`}
-              className={`h-2 rounded-full transition-all cursor-pointer ${
-                index === activeIndex
-                  ? "w-8 bg-blue-600"
-                  : "w-2 bg-slate-300 hover:bg-slate-400"
-              }`}
-            />
-          ))}
-        </div>
+        {plansLoading && (
+          <p className="mt-8 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+            Loading your saved plans...
+          </p>
+        )}
+
+        {plansError && !plansLoading && (
+          <p className="mt-8 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {plansError}
+          </p>
+        )}
+
+        {!plansLoading && !plansError && total === 0 && (
+          <div className="mt-8 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
+            <p className="text-base font-semibold text-slate-700">
+              No saved plans yet
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              Save a study plan from the chat to see it appear here.
+            </p>
+          </div>
+        )}
+
+        {!plansLoading && !plansError && total > 0 && (
+          <>
+            <div className="mt-8 flex-1 overflow-hidden">
+              <div
+                className="flex h-full transition-transform duration-500 ease-out"
+                style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+              >
+                {plans.map((plan) => (
+                  <article key={plan.id} className="w-full shrink-0 px-1">
+                    <div className="flex h-full min-h-[20rem] flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-8">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                        Study Plan
+                      </p>
+                      <h4 className="break-words text-2xl font-bold text-slate-900">
+                        {plan.title}
+                      </h4>
+                      {plan.description && (
+                        <p className="text-base leading-7 text-slate-600">
+                          {plan.description}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 font-medium">
+                          {plan.weeks?.length ?? 0} weeks
+                        </span>
+                      </div>
+                      <div className="mt-auto pt-4">
+                        <button
+                          type="button"
+                          className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition cursor-pointer hover:bg-blue-700"
+                        >
+                          View details
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            {total > 1 && (
+              <div className="mt-6 flex items-center justify-center gap-2">
+                {plans.map((plan, index) => (
+                  <button
+                    key={plan.id}
+                    type="button"
+                    onClick={() => setActiveIndex(index)}
+                    aria-label={`Go to plan ${index + 1}`}
+                    className={`h-2 rounded-full transition-all cursor-pointer ${
+                      index === activeIndex
+                        ? "w-8 bg-blue-600"
+                        : "w-2 bg-slate-300 hover:bg-slate-400"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </section>
     </div>
   );

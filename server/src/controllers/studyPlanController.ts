@@ -35,7 +35,8 @@ export class StudyPlanController {
 
             return res.status(201).json({
                 success: true,
-                studyPlan: result
+                plans: result
+
             });
 
         } catch(error: any) {

@@ -1,4 +1,9 @@
-import { StudyPlanRequest, StudyPlanResponse, Topic } from "./types.js";
+import {
+  SavedPlansResponse,
+  StudyPlanRequest,
+  StudyPlanResponse,
+  Topic,
+} from "./types.js";
 
 type AuthResponse = {
   success: boolean;
@@ -119,6 +124,18 @@ export async function createStudyPlan(
   });
 
   return parseJsonResponse<StudyPlanResponse>(response);
+}
+
+export async function getPlansByUserId(userId: number): Promise<SavedPlansResponse> {
+  const response = await fetch(`${API_BASE_URL}/study-plan/get-saved-plans`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    credentials: "include"
+  })
+
+  return parseJsonResponse<SavedPlansResponse>(response);
 }
 
 export async function converse(messages: ChatMessage[]): Promise<GroqResponse> {
