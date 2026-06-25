@@ -42,6 +42,8 @@ export default class GroqService {
       "Do not create the plan until you have all required details.",
       "You must respond in the same language as the user prompt",
       "When you are ready, respond with only valid JSON using this schema:",
+      "Reply in natural language only. Ask clarifying questions one at a time. Do not output JSON or schema placeholders until the user has answered your questions and explicitly asked for the plan.",
+      "If the user asks for you to create a plan with no valuable information, respond them saying you need more information, instead of returning an empty JSON",
       `{
         "title": "string",
         "description": "string",
