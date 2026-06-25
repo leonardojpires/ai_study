@@ -1,4 +1,4 @@
-import { User } from "./User.js";
+import { User } from "../domains/User.js";
 
 export interface IUserRepository {
     findById(id: number): Promise<User | null>;

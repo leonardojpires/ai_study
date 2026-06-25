@@ -1,4 +1,4 @@
-import { IStudyPlanRepository } from "../domains/IStudyPlanRepository.js";
+import { IStudyPlanRepository } from "../repositories/IStudyPlanRepository.js";
 import { StudyPlan } from "../domains/StudyPlan.js";
 import { CreateStudyPlanDTO } from "../dtos/StudyPlanDTO.js";
 
@@ -21,5 +21,11 @@ export class StudyPlanService {
         const studyPlans = await this.studyPlanRepository.getPlansByUserId(userId);
 
         return studyPlans;
+    }
+
+    async deletePlan(planId: number) {
+        const affectedRows = await this.studyPlanRepository.deletePlan(planId);
+
+        if (affectedRows === 0) throw new Error("Study plan not found.");
     }
 }

@@ -13,5 +13,6 @@ const studyPlanController = new StudyPlanController(studyPlanService);
 
 studyPlanRouter.post("/generate", authenticateToken, studyPlanController.generate);
 studyPlanRouter.get("/get-saved-plans", authenticateToken, studyPlanController.getPlansByUserId);
+studyPlanRouter.delete("/delete-plan/:id", authenticateToken, studyPlanController.deletePlan);
 
 export default studyPlanRouter;

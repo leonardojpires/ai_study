@@ -126,7 +126,7 @@ export async function createStudyPlan(
   return parseJsonResponse<StudyPlanResponse>(response);
 }
 
-export async function getPlansByUserId(userId: number): Promise<SavedPlansResponse> {
+export async function getPlansByUserId(): Promise<SavedPlansResponse> {
   const response = await fetch(`${API_BASE_URL}/study-plan/get-saved-plans`, {
     method: "GET",
     headers: {
@@ -136,6 +136,25 @@ export async function getPlansByUserId(userId: number): Promise<SavedPlansRespon
   })
 
   return parseJsonResponse<SavedPlansResponse>(response);
+}
+
+export async function deletePlan(planId: number) {
+  const response = await fetch(`${API_BASE_URL}/study-plan/delete-plan/${planId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) { 
+    const error = await response.json();
+    throw new Error(
+      error.message || "Failed to delete plan"
+    ) 
+  }
+
+  return response;
 }
 
 export async function converse(messages: ChatMessage[]): Promise<GroqResponse> {

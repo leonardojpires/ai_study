@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPlansByUserId } from "../api";
+import { deletePlan, getPlansByUserId } from "../api";
 import { SavedPlan } from "../types";
 
 type UserProfileData = {
@@ -28,6 +28,9 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
   const [plansLoading, setPlansLoading] = useState(false);
   const [plansError, setPlansError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [planToRemove, setPlanToRemove] = useState<SavedPlan | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [removeError, setRemoveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoading || !user) return;
@@ -39,7 +42,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
       setPlansError(null);
 
       try {
-        const response = await getPlansByUserId(user!.id);
+        const response = await getPlansByUserId();
         if (cancelled) return;
 
         if (response.success) {
@@ -70,6 +73,46 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
   const total = plans.length;
   const goPrev = () => setActiveIndex((i) => (i - 1 + total) % total);
   const goNext = () => setActiveIndex((i) => (i + 1) % total);
+
+  function openRemoveModal(plan: SavedPlan) {
+    setPlanToRemove(plan);
+    setRemoveError(null);
+  }
+
+  function closeRemoveModal() {
+    if (isRemoving) return;
+    setPlanToRemove(null);
+    setRemoveError(null);
+  }
+
+  async function confirmRemovePlan() {
+    if (!planToRemove || isRemoving) return;
+
+    setIsRemoving(true);
+    setRemoveError(null);
+
+    const targetId = planToRemove.id;
+    const previousPlans = plans;
+
+    try {
+      await deletePlan(targetId);
+      
+      const remainingPlans = plans.filter((p) => p.id !== targetId);
+      setPlans(remainingPlans);
+      setActiveIndex((current) => {
+        if (remainingPlans.length === 0) return 0;
+        return Math.min(current, remainingPlans.length - 1);
+      });
+
+      setPlanToRemove(null);
+    } catch (err: any) {
+      // Roll back if the backend rejects the removal.
+      setPlans(previousPlans);
+      setRemoveError(err?.message || "Failed to remove the plan. Please try again.");
+    } finally {
+      setIsRemoving(false);
+    }
+  }
 
   return (
     <div className="flex w-full flex-1 flex-col px-4 py-6 sm:px-6 lg:px-8 min-h-[calc(100vh-2rem)]">
@@ -105,7 +148,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
         )}
 
         {user && !isLoading && (
-          <div className="mt-8 grid flex-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid flex-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                 Name
@@ -123,16 +166,6 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
                 {user.email}
               </p>
             </div>
-
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                User ID
-              </p>
-              <p className="mt-2 text-base font-semibold text-slate-900">
-                #{user.id}
-              </p>
-            </div>
-
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                 Role
@@ -233,12 +266,20 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
                           {plan.weeks?.length ?? 0} weeks
                         </span>
                       </div>
-                      <div className="mt-auto pt-4">
+                      <div className="mt-auto flex flex-wrap gap-2 pt-4">
                         <button
                           type="button"
                           className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition cursor-pointer hover:bg-blue-700"
                         >
                           View details
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openRemoveModal(plan)}
+                          aria-label={`Remove plan ${plan.title}`}
+                          className="rounded-lg border border-red-200 bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition cursor-pointer hover:bg-red-50"
+                        >
+                          Remove
                         </button>
                       </div>
                     </div>
@@ -267,6 +308,82 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
           </>
         )}
       </section>
+
+      {/* Remove plan confirmation modal */}
+      {planToRemove && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="remove-plan-title"
+        >
+          <button
+            type="button"
+            aria-label="Close remove plan dialog"
+            onClick={closeRemoveModal}
+            disabled={isRemoving}
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm cursor-pointer disabled:cursor-not-allowed"
+          />
+          <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+            <div className="flex items-start gap-4">
+              <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 9v4m0 4h.01M10.29 3.86l-7.6 13.18A2 2 0 0 0 4.42 20h15.16a2 2 0 0 0 1.73-2.96L13.71 3.86a2 2 0 0 0-3.42 0z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <div className="min-w-0 flex-1">
+                <h4
+                  id="remove-plan-title"
+                  className="text-lg font-semibold text-slate-900"
+                >
+                  Remove saved plan?
+                </h4>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  You are about to remove{" "}
+                  <span className="font-semibold text-slate-900">
+                    “{planToRemove.title}”
+                  </span>{" "}
+                  from your library. This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            {removeError && (
+              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {removeError}
+              </p>
+            )}
+
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={closeRemoveModal}
+                disabled={isRemoving}
+                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition cursor-pointer hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmRemovePlan}
+                disabled={isRemoving}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition cursor-pointer hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isRemoving && (
+                  <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                )}
+                {isRemoving ? "Removing…" : "Remove plan"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

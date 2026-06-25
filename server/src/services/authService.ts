@@ -1,4 +1,4 @@
-import { IUserRepository } from "../domains/IUserRepository.js";
+import { IUserRepository } from "../repositories/IUserRepository.js";
 import { User } from "../domains/User.js";
 import bcrypt from 'bcrypt';
 import { buildToken } from "../jwt/jwt_build.js";
