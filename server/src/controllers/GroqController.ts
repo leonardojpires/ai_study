@@ -75,7 +75,7 @@ export class GroqController {
 
       const result = await this.groqService.converse(messages);
 
-      if (result.ready && result.plan) {
+      if (result.status === "ready" && result.plan) {
         if (!this.isValidStudyPlanPayload(result.plan)) {
           return res
             .status(422)

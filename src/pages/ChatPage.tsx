@@ -49,7 +49,7 @@ export function ChatPage() {
               {messages.map((message, index) => {
                 const isLastAssistantReady =
                   message.role === "assistant" &&
-                  message.ready &&
+                  message.status === "ready" &&
                   planPreview &&
                   index === messages.length - 1;
 

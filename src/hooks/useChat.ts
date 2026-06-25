@@ -6,7 +6,7 @@ import { PlanPreviewData } from "../components/chat/PlanPreview";
 const WELCOME_MESSAGE: ChatMessageData = {
   role: "assistant",
   text: "Hello! I am the study assistant powered by Groq AI. Tell me what you want to learn and I will create a study plan for you.",
-  ready: false,
+  status: "needs-info",
 };
 
 export interface UseChatResult {
@@ -45,7 +45,7 @@ export function useChat(): UseChatResult {
       const userMessage: ChatMessageData = {
         role: "user",
         text: prompt,
-        ready: false,
+        status: "needs-info",
       };
 
       setMessages((prev) => [...prev, userMessage]);
@@ -60,18 +60,18 @@ export function useChat(): UseChatResult {
         const result = await converse(conversation);
 
         const assistantText =
-          result.ready && result.plan
+          result.status === "ready" && result.plan
             ? `Groq generated a study plan recommendation titled “${result.plan.title}”. Review the preview below and save it if you like.`
             : result.assistantText.trim().startsWith("{")
-            ? "I generated a plan, but it came back in an unexpected format. Please try again."
+            ? result.assistantText
             : result.assistantText;
 
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", text: assistantText, ready: result.ready },
+          { role: "assistant", text: assistantText, status: result.status },
         ]);
 
-        if (result.ready && result.plan) {
+        if (result.status === "ready" && result.plan) {
           setPlanPreview(result.plan);
           setIsPlanSaved(false);
         }
@@ -80,7 +80,7 @@ export function useChat(): UseChatResult {
           error instanceof Error ? error.message : "Something went wrong.";
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", text: message, ready: false },
+          { role: "assistant", text: message, status: "needs-info" },
         ]);
       } finally {
         setIsGenerating(false);

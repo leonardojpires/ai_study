@@ -5,25 +5,21 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || "",
 });
 
-// interface GroqStudyPlanDTO {
-//   title: string;
-//   description: string;
-//   duration_hours: number;
-//   weeks: Array<{
-//     week: number;
-//     title: string;
-//     objectives: string[];
-//     topics: string[];
-//   }>;
-//   durationWeeks: number;
-//   hoursPerWeek: number;
-// }
-
 interface GroqConversationResult {
   assistantText: string;
-  ready: boolean;
+  status: "ready" | "needs-info";
   plan?: CreateStudyPlanDTO;
 }
+
+type GroqResponse =
+  | {
+      status: "needs-info";
+      question: string;
+    }
+  | {
+      status: "ready";
+      plan: CreateStudyPlanDTO;
+    };
 
 type ChatMessage = {
   role: "assistant" | "user";
@@ -33,32 +29,51 @@ type ChatMessage = {
 export default class GroqService {
   private buildPrompt(messages: ChatMessage[]) {
     const instructions = [
-      "You are an expert study-plan assistant.",
-      "Use exactly these field names: title, description, weeks, week_number, title, objectives, topics, is_saved",
-      "Do not use markdown",
-      "Do not wrap the JSON in code fences",
-      "Do not include any explanation outside the JSON",
-      "Ask clarifying questions until you have enough information to create a plan.",
-      "Do not create the plan until you have all required details.",
-      "You must respond in the same language as the user prompt",
-      "When you are ready, respond with only valid JSON using this schema:",
-      "Reply in natural language only. Ask clarifying questions one at a time. Do not output JSON or schema placeholders until the user has answered your questions and explicitly asked for the plan.",
-      "If the user asks for you to create a plan with no valuable information, respond them saying you need more information, instead of returning an empty JSON",
+      // Identity and tone
+      "You are an expert study-plan assistant who genuinely enjoys helping people learn.",
+      "You speak like a friendly, knowledgeable mentor: warm, encouraging, and curious about the learner's goals.",
+      "You are concise but never robotic. Avoid stiff or corporate phrasing.",
+      "Use light, natural language — the kind of tone a great tutor would use in a one-on-one session.",
+      "Show enthusiasm for the topic when relevant, and acknowledge the learner's ambition.",
+
+      // Output contract (strict)
+      "Always respond with valid JSON only.",
+      "Do not use markdown.",
+      "Do not wrap responses in code fences.",
+      "Do not include any text outside the JSON object.",
+      "Respond in the same language as the user.",
+
+      // Clarification mode
+      "If you do not have enough information to create a study plan, return:",
       `{
-        "title": "string",
-        "description": "string",
-        "weeks": [
-          {
-            "week_number": 1,
-            "title": "string",
-            "objectives": ["string"],
-            "topics": ["string"]
-          }
-        ],
-        "is_saved": false
-      }`,
-      "If you are not ready, reply with a follow-up question.",
-      "",
+    "status": "needs-info",
+    "question": "your question here"
+  }`,
+      "Ask only one clarifying question at a time, and phrase it conversationally.",
+      "Briefly acknowledge or react to what the user just said before asking your next question, so the conversation feels alive.",
+      "Do not generate a plan until you have enough information.",
+
+      // Ready mode
+      "When you have enough information, return:",
+      `{
+    "status": "ready",
+    "plan": {
+      "title": "string",
+      "description": "string",
+      "weeks": [
+        {
+          "week_number": 1,
+          "title": "string",
+          "objectives": ["string"],
+          "topics": ["string"]
+        }
+      ],
+      "is_saved": false
+    }
+  }`,
+      "Generate as many weeks as necessary for the topic, typically between 4 and 16.",
+      "Never return a plan when status is 'needs-info'.",
+      "Never return a question when status is 'ready'.",
     ];
 
     const history = messages
@@ -72,15 +87,10 @@ export default class GroqService {
     const response = await groq.chat.completions.create({
       model: process.env.GROQ_MODEL || "",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.2,
+      temperature: 0.7,
     });
 
     return response.choices[0]?.message?.content || "";
-  }
-
-  private extractJson(text: string): string | null {
-    const match = text.match(/\{[\s\S]*\}/);
-    return match ? match[0] : null;
   }
 
   private validatePlan(candidate: CreateStudyPlanDTO): boolean {
@@ -88,7 +98,7 @@ export default class GroqService {
       typeof candidate !== "object" ||
       candidate === null ||
       typeof candidate.title !== "string" ||
-      typeof candidate.description ==  null ||
+      typeof candidate.description !== "string" ||
       !Array.isArray(candidate.weeks) ||
       candidate.weeks.length === 0
     ) {
@@ -108,34 +118,41 @@ export default class GroqService {
     });
   }
 
-  private tryParsePlan(text: string): CreateStudyPlanDTO | null {
-    const json = this.extractJson(text);
-    if (!json) return null;
-
-    try {
-      const candidate = JSON.parse(json);
-      return this.validatePlan(candidate) ? candidate : null;
-    } catch {
-      return null;
-    }
-  }
-
   async converse(messages: ChatMessage[]): Promise<GroqConversationResult> {
     const prompt = this.buildPrompt(messages);
     const assistantText = await this.callGroq(prompt);
-    const plan = this.tryParsePlan(assistantText);
+
+    let data: GroqResponse;
+
+    data = JSON.parse(assistantText);
+
+    if (!data.status) {
+      return {
+        assistantText,
+        status: "needs-info",
+      };
+    }
+
+    if (data.status === "needs-info") {
+      return {
+        assistantText: data.question,
+        status: "needs-info",
+      };
+    }
+
+    const plan = this.validatePlan(data.plan) ? data.plan : null;
 
     if (plan) {
       return {
         assistantText: `Study plan generated: ${plan.title}`,
-        ready: true,
+        status: "ready",
         plan,
       };
     }
 
     return {
-      assistantText,
-      ready: false,
+      assistantText: "Invalid plan structure, please try again.",
+      status: "needs-info",
     };
   }
 }

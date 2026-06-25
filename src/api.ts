@@ -22,7 +22,7 @@ type ChatMessage = {
 
 type GroqResponse = {
   assistantText: string;
-  ready: boolean;
+  status: "ready" | "needs-info";
   plan?: {
     title: string;
     description: string;
@@ -32,7 +32,7 @@ type GroqResponse = {
       objectives: string[];
       topics: string[];
     }>;
-    ready: boolean;
+    status: "ready" | "needs-info";
   };
 };
 

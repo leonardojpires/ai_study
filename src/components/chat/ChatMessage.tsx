@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 export interface ChatMessageData {
   role: "assistant" | "user";
   text: string;
-  ready: boolean;
+  status: "ready" | "needs-info";
 }
 
 interface ChatMessageProps {
@@ -23,6 +23,7 @@ export function ChatMessage({ message, children }: ChatMessageProps) {
       }`}
     >
       <p className="text-sm leading-6 whitespace-pre-line">{message.text}</p>
+      <p className="text-sm leading-6 whitespace-pre-line">{message.status}</p>
       {children}
     </div>
   );
