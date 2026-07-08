@@ -6,7 +6,11 @@ interface RegisterFormProps {
   error?: string | null;
 }
 
-export function RegisterForm({ onRegister, isLoading, error }: RegisterFormProps) {
+export function RegisterForm({
+  onRegister,
+  isLoading,
+  error,
+}: RegisterFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,15 +30,19 @@ export function RegisterForm({ onRegister, isLoading, error }: RegisterFormProps
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <h2>Create an Account</h2>
-      <p className="text-xs text-slate-500">Create your account to start using the platform.</p>
-      {localError ? <div className="error">{localError}</div> : error && <div className="error">{error}</div>}
+      <p>Create your account to start using the platform.</p>
+      {localError ? (
+        <div className="error">{localError}</div>
+      ) : (
+        error && <div className="error">{error}</div>
+      )}
 
       <label>
         Full Name
         <input
           type="text"
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           placeholder="Jane Doe"
           required
         />
@@ -45,7 +53,7 @@ export function RegisterForm({ onRegister, isLoading, error }: RegisterFormProps
         <input
           type="email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           required
         />
@@ -56,7 +64,7 @@ export function RegisterForm({ onRegister, isLoading, error }: RegisterFormProps
         <input
           type="password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           placeholder="At least 8 characters"
           required
         />
@@ -67,16 +75,15 @@ export function RegisterForm({ onRegister, isLoading, error }: RegisterFormProps
         <input
           type="password"
           value={confirmPassword}
-          onChange={e => setConfirmPassword(e.target.value)}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Repeat password"
           required
         />
       </label>
 
-      <button type="submit" disabled={isLoading} className="cursor-pointer">
+      <button type="submit" disabled={isLoading}>
         {isLoading ? "Creating account..." : "Register"}
       </button>
-      <small className="text-xs text-slate-500 mt-2">Already registered? Login from the navbar.</small>
     </form>
   );
 }

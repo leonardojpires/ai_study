@@ -1,5 +1,5 @@
-import { Navigate, useLocation } from "react-router-dom";
 import { ReactNode } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/auth/AuthProvider";
 
 interface ProtectedRouteProps {
@@ -12,8 +12,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-500">Checking authentication…</p>
+      <div className="app-workspace flex min-h-screen items-center justify-center">
+        <p className="rounded-lg border border-[var(--glass-border)] bg-white/70 px-4 py-3 text-sm font-semibold text-[var(--text-muted)] shadow-sm backdrop-blur-xl">
+          Checking authentication...
+        </p>
       </div>
     );
   }

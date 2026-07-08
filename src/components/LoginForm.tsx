@@ -19,7 +19,7 @@ export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <h2>Login to Your Account</h2>
-      <p className="text-xs text-slate-500">Enter your account credentials to continue.</p>
+      <p>Enter your account credentials to continue.</p>
       {error && <div className="error">{error}</div>}
 
       <label>
@@ -27,7 +27,7 @@ export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
         <input
           type="email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           required
         />
@@ -38,21 +38,24 @@ export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
         <input
           type={showPassword ? "text" : "password"}
           value={password}
-          onChange={e => setPassword(e.target.value)}
-          placeholder="••••••••"
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Your password"
           required
         />
       </label>
 
-      <label className="flex items-center gap-2 text-sm text-slate-600">
-        <input type="checkbox" checked={showPassword} onChange={e => setShowPassword(e.target.checked)} />
+      <label className="checkbox-label">
+        <input
+          type="checkbox"
+          checked={showPassword}
+          onChange={(e) => setShowPassword(e.target.checked)}
+        />
         Show password
       </label>
 
-      <button type="submit" disabled={isLoading} className="cursor-pointer">
+      <button type="submit" disabled={isLoading}>
         {isLoading ? "Validating..." : "Login"}
       </button>
-      <small className="text-xs text-slate-500 mt-2">First time? Click Register in the navbar.</small>
     </form>
   );
 }

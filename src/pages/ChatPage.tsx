@@ -1,10 +1,17 @@
+import { useState } from "react";
 import { ChatMessage } from "../components/chat/ChatMessage";
 import { PlanActionBar } from "../components/chat/PlanActionBar";
 import { PlanPreview } from "../components/chat/PlanPreview";
+import { ConfirmationModal } from "../components/ConfirmationModal";
 import { PromptForm } from "../components/PromptForm";
+import { useToast } from "../components/ToastProvider";
 import { useChat } from "../hooks/useChat";
 
 export function ChatPage() {
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isRegenerateModalOpen, setIsRegenerateModalOpen] = useState(false);
+  const [isSavingPlan, setIsSavingPlan] = useState(false);
+  const { showToast } = useToast();
   const {
     messages,
     planPreview,
@@ -22,30 +29,73 @@ export function ChatPage() {
     await submitPrompt(prompt);
   }
 
-  async function handleSave() {
+  function handleSaveRequest() {
+    setIsSaveModalOpen(true);
+  }
+
+  async function handleSaveConfirm() {
+    setIsSavingPlan(true);
     try {
       await saveCurrentPlan();
+      setIsSaveModalOpen(false);
+      showToast({
+        title: "Plan saved",
+        message: "You can find it in your profile library.",
+        tone: "success",
+      });
     } catch (err) {
-      // Surface the error in the chat as an assistant message so the user knows.
       console.error("Failed to save plan:", err);
+      showToast({
+        title: "Could not save plan",
+        message: err instanceof Error ? err.message : "Please try again.",
+        tone: "error",
+      });
+    } finally {
+      setIsSavingPlan(false);
+    }
+  }
+
+  async function handleRegenerateConfirm() {
+    setIsRegenerateModalOpen(false);
+    try {
+      await regenerateLastPlan();
+      showToast({
+        title: "Generating another version",
+        message: "The assistant is preparing a fresh recommendation.",
+        tone: "info",
+      });
+    } catch (err) {
+      showToast({
+        title: "Could not regenerate",
+        message: err instanceof Error ? err.message : "Please try again.",
+        tone: "error",
+      });
     }
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-1 flex-col">
-      <div className="flex flex-1 flex-col min-h-[calc(100vh-5.5rem)] border border-slate-200 bg-slate-50 shadow-inner">
-        <div className="border-b border-slate-200 px-6 py-5 bg-white">
-          <h2 className="text-xl font-semibold text-slate-900">
-            AI Study Plan Chat
-          </h2>
-          <p className="text-sm text-slate-500">
-            Chat with the assistant and generate your study plan like a chatbot.
-          </p>
+    <section className="flex min-h-0 w-full flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col bg-[var(--chat-surface)]">
+        <div className="border-b border-[var(--glass-border)] bg-white/70 px-5 py-4 backdrop-blur-xl sm:px-7">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+                Workspace
+              </p>
+              <h1 className="mt-1 text-2xl font-black text-[var(--text)]">
+                AI Study Plan Chat
+              </h1>
+            </div>
+            <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-white/65 px-3 py-2 text-xs font-semibold text-[var(--text-muted)]">
+              <span className="h-2 w-2 rounded-full bg-[var(--success)]" />
+              Ready to plan
+            </div>
+          </div>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-hidden bg-slate-100">
-          <div className="h-full min-h-0 overflow-y-auto px-6 py-6 pb-32 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-            <div className="flex flex-col gap-4">
+        <div className="min-h-0 flex-1 overflow-hidden">
+          <div className="chat-scroll h-full min-h-0 overflow-y-auto px-4 py-6 pb-28 sm:px-7">
+            <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
               {messages.map((message, index) => {
                 const isLastAssistantReady =
                   message.role === "assistant" &&
@@ -66,18 +116,42 @@ export function ChatPage() {
           </div>
         </div>
 
-        <div className="sticky bottom-0 border-t border-slate-200 bg-white px-6 py-5 z-20">
-          {hasReadyPreview && (
-            <PlanActionBar
-              onSave={handleSave}
-              onTryAgain={regenerateLastPlan}
-              disabled={isGenerating}
-            />
-          )}
+        <div className="z-20 border-t border-[var(--glass-border)] bg-white/80 px-4 py-4 shadow-[0_-18px_45px_rgba(16,35,22,0.08)] backdrop-blur-xl sm:px-7">
+          <div className="mx-auto w-full max-w-5xl">
+            {hasReadyPreview && (
+              <PlanActionBar
+                onSave={handleSaveRequest}
+                onTryAgain={() => setIsRegenerateModalOpen(true)}
+                disabled={isGenerating}
+              />
+            )}
 
-          <PromptForm isSubmitting={isGenerating} onSubmit={handleSubmit} />
+            <PromptForm isSubmitting={isGenerating} onSubmit={handleSubmit} />
+          </div>
         </div>
       </div>
-    </div>
+
+      {isSaveModalOpen && (
+        <ConfirmationModal
+          title="Save this study plan?"
+          description="This will add the generated roadmap to your saved library so you can revisit it from your profile."
+          confirmLabel="Save plan"
+          isLoading={isSavingPlan}
+          onCancel={() => setIsSaveModalOpen(false)}
+          onConfirm={handleSaveConfirm}
+        />
+      )}
+
+      {isRegenerateModalOpen && (
+        <ConfirmationModal
+          title="Try another version?"
+          description="This keeps the same prompt but asks the assistant for a fresh study plan recommendation."
+          confirmLabel="Try again"
+          isLoading={isGenerating}
+          onCancel={() => setIsRegenerateModalOpen(false)}
+          onConfirm={handleRegenerateConfirm}
+        />
+      )}
+    </section>
   );
 }

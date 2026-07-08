@@ -18,12 +18,25 @@ export function ChatMessage({ message, children }: ChatMessageProps) {
     <div
       className={`max-w-3xl ${
         isAssistant
-          ? "self-start bg-white text-slate-900 rounded-[1.5rem] rounded-br-none border border-slate-200 px-5 py-4 shadow-sm"
-          : "self-end bg-blue-600 text-white rounded-[1.5rem] rounded-bl-none px-5 py-4 shadow-sm"
+          ? "self-start rounded-[1.25rem] rounded-bl-sm border border-[var(--glass-border)] bg-white/82 px-5 py-4 text-black shadow-sm backdrop-blur-xl"
+          : "self-end rounded-[1.25rem] rounded-br-sm bg-[var(--accent)] px-5 py-4 text-black shadow-[0_12px_30px_rgba(31,85,56,0.22)]"
       }`}
     >
-      <p className="text-sm leading-6 whitespace-pre-line">{message.text}</p>
-      <p className="text-sm leading-6 whitespace-pre-line">{message.status}</p>
+      <div className="mb-2 flex items-center gap-2">
+        <span
+          className={`h-2 w-2 rounded-full ${
+            isAssistant ? "bg-[var(--success)]" : "bg-black/70"
+          }`}
+        />
+        <span
+          className={`text-[0.68rem] font-bold uppercase tracking-[0.14em] ${
+            isAssistant ? "text-black/60" : "text-white"
+          }`}
+        >
+          {isAssistant ? message.status.replace("-", " ") : "You"}
+        </span>
+      </div>
+      <p className={`whitespace-pre-line text-sm leading-6 ${ isAssistant ? "text-black" : "text-white" }`}>{message.text}</p>
       {children}
     </div>
   );

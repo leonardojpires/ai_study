@@ -4,7 +4,6 @@ import { NextFunction, Request, Response } from "express";
 type AuthenticatedRequest = Request & { user: any };
 
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers["authorization"];
     const token = req.cookies?.[process.env.COOKIE_NAME ?? "auth_token"];
 
     if (!token) {

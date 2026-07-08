@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { deletePlan, getPlansByUserId } from "../api";
+import { useToast } from "./ToastProvider";
 import { SavedPlan } from "../types";
 
 type UserProfileData = {
@@ -16,6 +17,7 @@ interface UserProfileProps {
 }
 
 export function UserProfile({ user, isLoading, error }: UserProfileProps) {
+  const { showToast } = useToast();
   const initials =
     user?.name
       .split(" ")
@@ -96,145 +98,142 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
 
     try {
       await deletePlan(targetId);
-      
+
       const remainingPlans = plans.filter((p) => p.id !== targetId);
       setPlans(remainingPlans);
       setActiveIndex((current) => {
         if (remainingPlans.length === 0) return 0;
         return Math.min(current, remainingPlans.length - 1);
       });
-
       setPlanToRemove(null);
+      showToast({
+        title: "Plan removed",
+        message: "Your library has been updated.",
+        tone: "success",
+      });
     } catch (err: any) {
-      // Roll back if the backend rejects the removal.
       setPlans(previousPlans);
-      setRemoveError(err?.message || "Failed to remove the plan. Please try again.");
+      const message = err?.message || "Failed to remove the plan. Please try again.";
+      setRemoveError(message);
+      showToast({
+        title: "Could not remove plan",
+        message,
+        tone: "error",
+      });
     } finally {
       setIsRemoving(false);
     }
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col px-4 py-6 sm:px-6 lg:px-8 min-h-[calc(100vh-2rem)]">
-      <section className="mx-auto flex w-full max-w-6xl flex-1 flex-col rounded-2xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+      <section className="mx-auto flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <div className="inline-flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-blue-100 text-3xl font-bold text-blue-700">
+          <div className="inline-flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-3xl font-black text-white shadow-lg">
             {initials}
           </div>
 
           <div className="min-w-0">
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Profile
-            </p>
-            <h2 className="mt-1 break-words text-3xl font-bold text-slate-900">
+            <p className="eyebrow">Profile</p>
+            <h2 className="mt-2 break-words text-3xl font-black text-[var(--text)]">
               {user?.name || "User account"}
             </h2>
-            <p className="mt-1 break-words text-base text-slate-500">
+            <p className="mt-1 break-words text-base text-[var(--text-muted)]">
               {user?.email || "Account information"}
             </p>
           </div>
         </div>
 
         {isLoading && (
-          <p className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+          <p className="mt-6 rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 px-4 py-3 text-sm text-[var(--text-muted)]">
             Loading profile information...
           </p>
         )}
 
         {error && (
-          <p className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </p>
         )}
 
         {user && !isLoading && (
-          <div className="mt-8 grid flex-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                Name
-              </p>
-              <p className="mt-2 break-words text-base font-semibold text-slate-900">
-                {user.name}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                Email
-              </p>
-              <p className="mt-2 break-words text-base font-semibold text-slate-900">
-                {user.email}
-              </p>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                Role
-              </p>
-              <p className="mt-2 text-base font-semibold text-slate-900">
-                {user.isAdmin ? "Admin" : "Student"}
-              </p>
-            </div>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["Name", user.name],
+              ["Email", user.email],
+              ["Role", user.isAdmin ? "Admin" : "Student"],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-5"
+              >
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
+                  {label}
+                </p>
+                <p className="mt-2 break-words text-base font-bold text-[var(--text)]">
+                  {value}
+                </p>
+              </div>
+            ))}
           </div>
         )}
       </section>
 
-      {/* Saved Plans Section */}
-      <section className="mx-auto mt-6 flex w-full max-w-6xl flex-1 flex-col rounded-2xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+      <section className="mx-auto mt-6 flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Library
-            </p>
-            <h3 className="mt-1 text-2xl font-bold text-slate-900">
+            <p className="eyebrow">Library</p>
+            <h3 className="mt-2 text-2xl font-black text-[var(--text)]">
               My Saved Plans
             </h3>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
               Browse the study plans you have saved.
             </p>
           </div>
+
           {total > 1 && (
-            <div className="mt-3 flex items-center gap-2 sm:mt-0">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={goPrev}
                 aria-label="Previous plan"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition cursor-pointer hover:bg-slate-100"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/80 text-[var(--text-muted)] transition hover:bg-white"
               >
-                ‹
+                &lt;
               </button>
-              <span className="text-xs font-semibold text-slate-500">
+              <span className="text-xs font-semibold text-[var(--text-muted)]">
                 {activeIndex + 1} / {total}
               </span>
               <button
                 type="button"
                 onClick={goNext}
                 aria-label="Next plan"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition cursor-pointer hover:bg-slate-100"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/80 text-[var(--text-muted)] transition hover:bg-white"
               >
-                ›
+                &gt;
               </button>
             </div>
           )}
         </div>
 
         {plansLoading && (
-          <p className="mt-8 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+          <p className="mt-8 rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 px-4 py-3 text-sm text-[var(--text-muted)]">
             Loading your saved plans...
           </p>
         )}
 
         {plansError && !plansLoading && (
-          <p className="mt-8 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p className="mt-8 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {plansError}
           </p>
         )}
 
         {!plansLoading && !plansError && total === 0 && (
-          <div className="mt-8 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
-            <p className="text-base font-semibold text-slate-700">
+          <div className="mt-8 rounded-lg border border-dashed border-[var(--border)] bg-[var(--surface-soft)]/70 px-6 py-10 text-center">
+            <p className="text-base font-bold text-[var(--text)]">
               No saved plans yet
             </p>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
               Save a study plan from the chat to see it appear here.
             </p>
           </div>
@@ -242,34 +241,34 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
 
         {!plansLoading && !plansError && total > 0 && (
           <>
-            <div className="mt-8 flex-1 overflow-hidden">
+            <div className="mt-8 overflow-hidden">
               <div
-                className="flex h-full transition-transform duration-500 ease-out"
+                className="flex transition-transform duration-500 ease-out"
                 style={{ transform: `translateX(-${activeIndex * 100}%)` }}
               >
                 {plans.map((plan) => (
                   <article key={plan.id} className="w-full shrink-0 px-1">
-                    <div className="flex h-full min-h-[20rem] flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-8">
-                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <div className="flex min-h-[20rem] flex-col gap-4 rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-6 sm:p-8">
+                      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
                         Study Plan
                       </p>
-                      <h4 className="break-words text-2xl font-bold text-slate-900">
+                      <h4 className="break-words text-2xl font-black text-[var(--text)]">
                         {plan.title}
                       </h4>
                       {plan.description && (
-                        <p className="text-base leading-7 text-slate-600">
+                        <p className="text-base leading-7 text-[var(--text-muted)]">
                           {plan.description}
                         </p>
                       )}
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
-                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 font-medium">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
+                        <span className="rounded-full border border-[var(--glass-border)] bg-white/80 px-3 py-1 font-bold">
                           {plan.weeks?.length ?? 0} weeks
                         </span>
                       </div>
                       <div className="mt-auto flex flex-wrap gap-2 pt-4">
                         <button
                           type="button"
-                          className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition cursor-pointer hover:bg-blue-700"
+                          className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[var(--accent-strong)]"
                         >
                           View details
                         </button>
@@ -277,7 +276,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
                           type="button"
                           onClick={() => openRemoveModal(plan)}
                           aria-label={`Remove plan ${plan.title}`}
-                          className="rounded-lg border border-red-200 bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition cursor-pointer hover:bg-red-50"
+                          className="rounded-lg border border-red-200 bg-white/80 px-5 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-50"
                         >
                           Remove
                         </button>
@@ -296,10 +295,10 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
                     type="button"
                     onClick={() => setActiveIndex(index)}
                     aria-label={`Go to plan ${index + 1}`}
-                    className={`h-2 rounded-full transition-all cursor-pointer ${
+                    className={`h-2 rounded-full transition-all ${
                       index === activeIndex
-                        ? "w-8 bg-blue-600"
-                        : "w-2 bg-slate-300 hover:bg-slate-400"
+                        ? "w-8 bg-[var(--accent)]"
+                        : "w-2 bg-[var(--border)] hover:bg-[var(--text-muted)]"
                     }`}
                   />
                 ))}
@@ -309,7 +308,6 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
         )}
       </section>
 
-      {/* Remove plan confirmation modal */}
       {planToRemove && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center px-4"
@@ -322,32 +320,24 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
             aria-label="Close remove plan dialog"
             onClick={closeRemoveModal}
             disabled={isRemoving}
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm cursor-pointer disabled:cursor-not-allowed"
+            className="absolute inset-0 bg-[#102316]/55 backdrop-blur-sm disabled:cursor-not-allowed"
           />
-          <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+          <div className="relative z-10 w-full max-w-md rounded-lg border border-[var(--glass-border)] bg-white p-6 shadow-2xl">
             <div className="flex items-start gap-4">
               <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 9v4m0 4h.01M10.29 3.86l-7.6 13.18A2 2 0 0 0 4.42 20h15.16a2 2 0 0 0 1.73-2.96L13.71 3.86a2 2 0 0 0-3.42 0z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                !
               </div>
               <div className="min-w-0 flex-1">
                 <h4
                   id="remove-plan-title"
-                  className="text-lg font-semibold text-slate-900"
+                  className="text-lg font-bold text-[var(--text)]"
                 >
                   Remove saved plan?
                 </h4>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
                   You are about to remove{" "}
-                  <span className="font-semibold text-slate-900">
-                    “{planToRemove.title}”
+                  <span className="font-bold text-[var(--text)]">
+                    "{planToRemove.title}"
                   </span>{" "}
                   from your library. This action cannot be undone.
                 </p>
@@ -365,7 +355,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
                 type="button"
                 onClick={closeRemoveModal}
                 disabled={isRemoving}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition cursor-pointer hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg border border-[var(--glass-border)] bg-white px-4 py-2 text-sm font-bold text-[var(--text-muted)] transition hover:bg-[var(--surface-soft)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -373,12 +363,12 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
                 type="button"
                 onClick={confirmRemovePlan}
                 disabled={isRemoving}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition cursor-pointer hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isRemoving && (
                   <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 )}
-                {isRemoving ? "Removing…" : "Remove plan"}
+                {isRemoving ? "Removing..." : "Remove plan"}
               </button>
             </div>
           </div>

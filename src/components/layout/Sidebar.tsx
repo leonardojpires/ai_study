@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { BrandMark } from "../BrandMark";
+import { ConfirmationModal } from "../ConfirmationModal";
+import { useToast } from "../ToastProvider";
 import { useAuth } from "../../hooks/auth/AuthProvider";
 
 interface NavItem {
@@ -8,7 +11,7 @@ interface NavItem {
 }
 
 const AUTH_NAV: NavItem[] = [
-  { to: "/", label: "Home" },
+  { to: "/chat", label: "Chatroom" },
   { to: "/guide", label: "Guide" },
 ];
 
@@ -20,46 +23,63 @@ const GUEST_NAV: NavItem[] = [
 export function Sidebar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navItems = isAuthenticated ? AUTH_NAV : GUEST_NAV;
 
   async function handleLogout() {
     setProfileMenuOpen(false);
-    await logout();
-    navigate("/login", { replace: true });
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      showToast({
+        title: "Logged out",
+        message: "Your session has been closed.",
+        tone: "success",
+      });
+      setIsLogoutModalOpen(false);
+      navigate("/", { replace: true });
+    } catch (err) {
+      showToast({
+        title: "Could not log out",
+        message: err instanceof Error ? err.message : "Please try again.",
+        tone: "error",
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
   }
 
   return (
-    <aside className="hidden md:flex sticky top-0 self-start flex-col w-72 bg-white shadow-2xl px-8 py-10 items-center gap-8 border-r border-slate-200 h-screen">
-      <div className="flex flex-col items-center gap-2">
-        <div className="rounded-full bg-blue-100 p-4 mb-2">
-          <svg width="40" height="40" fill="none" viewBox="0 0 24 24">
-            <path
-              fill="#2563eb"
-              d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 3a7 7 0 110 14A7 7 0 0112 5zm0 2a5 5 0 100 10A5 5 0 0012 7z"
-            />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-blue-700 tracking-tight text-center">
-          AI Study Plan
-        </h1>
-        <p className="text-slate-500 text-center text-sm">
-          Your personal roadmap generator
+    <aside className="hidden h-screen w-72 shrink-0 border-r border-[var(--glass-border)] bg-white/55 px-5 py-6 shadow-[0_24px_70px_rgba(16,35,22,0.10)] backdrop-blur-2xl md:flex md:flex-col">
+      <button
+        type="button"
+        onClick={() => navigate("/")}
+        className="brand-lockup px-2 text-left"
+      >
+        <BrandMark />
+      </button>
+
+      <div className="sidebar-note mt-5 rounded-lg border border-[var(--glass-border)] bg-white/45 p-4">
+        <p className="text-sm leading-6 text-[var(--text-muted)]">
+          Your calm workspace for turning study goals into practical roadmaps.
         </p>
       </div>
 
-      <nav className="flex flex-col gap-2 w-full mt-8">
+      <nav className="mt-8 flex w-full flex-col gap-2">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === "/"}
+            end={item.to === "/chat"}
             className={({ isActive }) =>
-              `w-full py-2 rounded-lg text-left px-4 font-medium transition cursor-pointer ${
+              `w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${
                 isActive
-                  ? "bg-blue-100 text-blue-700"
-                  : "hover:bg-slate-100 text-slate-700"
+                  ? "bg-[var(--accent)] text-white shadow-sm"
+                  : "text-[var(--text-muted)] hover:bg-white/70 hover:text-[var(--text)]"
               }`
             }
           >
@@ -69,27 +89,29 @@ export function Sidebar() {
       </nav>
 
       {isAuthenticated && (
-        <div className="w-full relative">
+        <div className="relative mt-6 w-full">
           <button
             type="button"
             onClick={() => setProfileMenuOpen((open) => !open)}
-            className="w-full flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition cursor-pointer hover:bg-slate-100"
+            className="flex w-full items-center gap-3 rounded-lg border border-[var(--glass-border)] bg-white/55 px-4 py-3 text-left shadow-sm transition hover:bg-white/80"
           >
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-semibold">
-              U
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--accent)] text-sm font-bold text-white">
+              {user?.name?.[0]?.toUpperCase() ?? "U"}
             </span>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
-              <p className="text-xs text-slate-500">Account actions</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-[var(--text)]">
+                {user?.name}
+              </p>
+              <p className="text-xs text-[var(--text-muted)]">Account actions</p>
             </div>
-            <span className="text-slate-400">▾</span>
+            <span className="text-[var(--text-muted)]">v</span>
           </button>
 
           {profileMenuOpen && (
-            <div className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+            <div className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white shadow-xl">
               <button
                 type="button"
-                className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
+                className="w-full px-4 py-3 text-left text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-soft)]"
                 onClick={() => {
                   setProfileMenuOpen(false);
                   navigate("/profile");
@@ -99,8 +121,11 @@ export function Sidebar() {
               </button>
               <button
                 type="button"
-                className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
-                onClick={handleLogout}
+                className="w-full px-4 py-3 text-left text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-soft)]"
+                onClick={() => {
+                  setProfileMenuOpen(false);
+                  setIsLogoutModalOpen(true);
+                }}
               >
                 Log out
               </button>
@@ -110,9 +135,22 @@ export function Sidebar() {
       )}
 
       <div className="flex-1" />
-      <footer className="text-xs text-slate-400 text-center">
-        &copy; {new Date().getFullYear()} StudyPlan AI
+      <footer className="rounded-lg border border-[var(--glass-border)] bg-white/45 p-4 text-xs leading-5 text-[var(--text-muted)]">
+        <strong className="block text-[var(--text)]">StudyPlan AI</strong>
+        Built for focused learning in {new Date().getFullYear()}.
       </footer>
+
+      {isLogoutModalOpen && (
+        <ConfirmationModal
+          title="Log out?"
+          description="You can come back anytime. Your saved plans will stay in your library."
+          confirmLabel="Log out"
+          tone="danger"
+          isLoading={isLoggingOut}
+          onCancel={() => setIsLogoutModalOpen(false)}
+          onConfirm={handleLogout}
+        />
+      )}
     </aside>
   );
 }

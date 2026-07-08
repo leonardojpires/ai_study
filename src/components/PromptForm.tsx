@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+  import { FormEvent, useMemo, useState } from "react";
 
 interface PromptFormProps {
   isSubmitting: boolean;
@@ -33,29 +33,33 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="bg-white rounded-full border border-slate-200 shadow-sm px-4 py-3 flex items-end gap-3">
+      <div className="flex items-end gap-3 rounded-lg border border-[var(--glass-border)] bg-white/85 px-4 py-3 shadow-sm backdrop-blur-xl">
         <textarea
           aria-label="Study plan prompt"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type your message..."
+          placeholder="Describe what you want to learn..."
           rows={1}
-          className="flex-1 min-h-[48px] max-h-32 w-full resize-none bg-transparent text-base leading-6 placeholder:text-slate-400 focus:outline-none"
+          className="min-h-[48px] max-h-32 w-full flex-1 resize-none bg-transparent text-base leading-6 text-black placeholder:text-black/45 focus:outline-none"
           required
         />
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center justify-center bg-blue-600 text-white px-5 py-3 rounded-full shadow hover:bg-blue-700 disabled:opacity-60 font-semibold text-sm transition cursor-pointer"
+          className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[var(--accent-strong)] disabled:opacity-60"
         >
           {isSubmitting ? "Sending..." : "Send"}
         </button>
       </div>
-      <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
+      <div className="mt-2 flex items-center justify-between text-xs text-[var(--text-muted)]">
         <span>{charCount} characters</span>
         {examples.length > 0 && (
-          <button type="button" onClick={() => applyExample(examples[0])} className="text-blue-600 hover:underline cursor-pointer">
+          <button
+            type="button"
+            onClick={() => applyExample(examples[0])}
+            className="font-semibold text-[var(--accent)] hover:underline"
+          >
             Try an example
           </button>
         )}

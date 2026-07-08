@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { BrandMark } from "../BrandMark";
 import { useAuth } from "../../hooks/auth/AuthProvider";
 
 export function MobileHeader() {
@@ -6,40 +7,49 @@ export function MobileHeader() {
   const navigate = useNavigate();
 
   function linkClass(isActive: boolean) {
-    return `flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer text-center ${
-      isActive ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"
+    return `flex-1 rounded-lg px-3 py-2 text-center text-sm font-semibold transition ${
+      isActive
+        ? "bg-[var(--accent)] text-white"
+        : "bg-white/55 text-[var(--text-muted)] hover:bg-white/85"
     }`;
   }
 
   return (
-    <header className="w-full px-4 py-6 bg-white shadow md:hidden flex flex-col items-center gap-2">
-      <h1 className="text-2xl font-bold text-blue-700 tracking-tight">
-        AI Study Plan
-      </h1>
-      <p className="text-slate-500 text-center text-sm">
-        Your personal roadmap generator
-      </p>
+    <header className="border-b border-[var(--glass-border)] bg-white/70 px-4 py-4 shadow-sm backdrop-blur-2xl md:hidden">
+      <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="brand-lockup min-w-0 text-left"
+        >
+          <BrandMark />
+        </button>
+      </div>
+
       {isAuthenticated ? (
-        <div className="mt-2 flex w-full max-w-sm gap-2">
-          <NavLink to="/" end className={({ isActive }) => linkClass(isActive)}>
-            Home
+        <nav className="mx-auto mt-4 flex max-w-3xl gap-2">
+          <NavLink to="/chat" end className={({ isActive }) => linkClass(isActive)}>
+            Chat
+          </NavLink>
+          <NavLink to="/guide" className={({ isActive }) => linkClass(isActive)}>
+            Guide
           </NavLink>
           <NavLink to="/profile" className={({ isActive }) => linkClass(isActive)}>
             Profile
           </NavLink>
-        </div>
+        </nav>
       ) : (
-        <div className="mt-2 flex w-full max-w-sm gap-2">
+        <div className="mx-auto mt-4 flex max-w-3xl gap-2">
           <button
             type="button"
-            className="flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer bg-blue-600 text-white"
+            className="flex-1 rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white"
             onClick={() => navigate("/login")}
           >
-            Login
+            Log in
           </button>
           <button
             type="button"
-            className="flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition cursor-pointer bg-slate-100 text-slate-700"
+            className="flex-1 rounded-lg bg-white/55 px-3 py-2 text-sm font-semibold text-[var(--text-muted)]"
             onClick={() => navigate("/register")}
           >
             Register

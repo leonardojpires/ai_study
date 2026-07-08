@@ -6,8 +6,8 @@ interface PlanActionBarProps {
 
 export function PlanActionBar({ onSave, onTryAgain, disabled }: PlanActionBarProps) {
   return (
-    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <span className="text-sm text-slate-600">
+    <div className="mb-4 flex flex-col gap-3 rounded-lg border border-[var(--glass-border)] bg-[var(--success-bg)]/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <span className="text-sm font-medium text-[var(--success)]">
         Plan recommendation is ready. Save it or try again.
       </span>
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -15,7 +15,7 @@ export function PlanActionBar({ onSave, onTryAgain, disabled }: PlanActionBarPro
           type="button"
           disabled={disabled}
           onClick={onSave}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           Save plan
         </button>
@@ -23,7 +23,7 @@ export function PlanActionBar({ onSave, onTryAgain, disabled }: PlanActionBarPro
           type="button"
           disabled={disabled}
           onClick={onTryAgain}
-          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition cursor-pointer hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-lg border border-[var(--glass-border)] bg-white/80 px-4 py-2 text-sm font-semibold text-[var(--text-muted)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           Try again
         </button>

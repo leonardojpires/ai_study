@@ -1,30 +1,28 @@
 export function GuidePage() {
   return (
-    <div className="w-full max-w-3xl mx-auto px-6 py-10">
-      <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
-          Guide
-        </p>
-        <h1 className="mt-1 text-3xl font-bold text-slate-900">
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-4xl rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+        <p className="eyebrow">Guide</p>
+        <h1 className="mt-3 text-3xl font-black text-[var(--text)]">
           How to use AI Study Plan
         </h1>
-        <p className="mt-3 text-base text-slate-600">
+        <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--text-muted)]">
           Follow these steps to generate a personalised study roadmap with the
           help of our AI assistant.
         </p>
 
-        <ol className="mt-8 space-y-5 text-sm text-slate-700">
-          <li className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-            <p className="text-base font-semibold text-slate-900">
+        <ol className="mt-8 grid gap-4 text-sm text-[var(--text-muted)] sm:grid-cols-2">
+          <li className="rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-5">
+            <p className="text-base font-bold text-[var(--text)]">
               1. Start a conversation
             </p>
             <p className="mt-2">
-              From the home page, describe the topic you want to learn in the
+              From the chatroom, describe the topic you want to learn in the
               prompt box at the bottom of the chat.
             </p>
           </li>
-          <li className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-            <p className="text-base font-semibold text-slate-900">
+          <li className="rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-5">
+            <p className="text-base font-bold text-[var(--text)]">
               2. Review the recommendation
             </p>
             <p className="mt-2">
@@ -32,8 +30,8 @@ export function GuidePage() {
               the weekly breakdown of objectives and topics.
             </p>
           </li>
-          <li className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-            <p className="text-base font-semibold text-slate-900">
+          <li className="rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-5">
+            <p className="text-base font-bold text-[var(--text)]">
               3. Save or regenerate
             </p>
             <p className="mt-2">
@@ -41,8 +39,8 @@ export function GuidePage() {
               recommendation.
             </p>
           </li>
-          <li className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-            <p className="text-base font-semibold text-slate-900">
+          <li className="rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-5">
+            <p className="text-base font-bold text-[var(--text)]">
               4. Manage your library
             </p>
             <p className="mt-2">

@@ -2,20 +2,19 @@ import { Link } from "react-router-dom";
 
 export function NotFoundPage() {
   return (
-    <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 my-8 text-center">
-      <p className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
-        404
-      </p>
-      <h1 className="mt-2 text-2xl font-bold text-slate-900">Page not found</h1>
-      <p className="mt-3 text-sm text-slate-600">
+    <main className="auth-page flex min-h-screen items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md rounded-lg border border-[var(--glass-border)] bg-white/70 p-8 text-center shadow-2xl backdrop-blur-2xl">
+        <p className="eyebrow">404</p>
+        <h1 className="mt-2 text-2xl font-black text-[var(--text)]">
+          Page not found
+        </h1>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
         The page you were looking for does not exist or has been moved.
-      </p>
-      <Link
-        to="/"
-        className="mt-6 inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
-      >
-        Back to home
-      </Link>
-    </div>
+        </p>
+        <Link to="/" className="btn-primary mt-6">
+          Back to home
+        </Link>
+      </div>
+    </main>
   );
 }
