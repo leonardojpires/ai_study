@@ -95,7 +95,7 @@ export function ChatPage() {
 
         <div className="min-h-0 flex-1 overflow-hidden">
           <div className="chat-scroll h-full min-h-0 overflow-y-auto px-4 py-6 pb-28 sm:px-7">
-            <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
+            <div className="mx-auto flex w-full  flex-col gap-4">
               {messages.map((message, index) => {
                 const isLastAssistantReady =
                   message.role === "assistant" &&
