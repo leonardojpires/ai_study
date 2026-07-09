@@ -38,20 +38,20 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     try {
       await conn.beginTransaction();
 
-      const [result, _] = await conn.query<ResultSetHeader>(
+      const [result, _] = await conn.execute<ResultSetHeader>(
         "INSERT INTO study_plans (user_id, title, description, is_saved) VALUES (?, ?, ?, ?)",
         [
           studyPlan.user_id,
           studyPlan.title,
-          studyPlan.description,
-          studyPlan.is_saved,
+          studyPlan.description ?? '',
+          studyPlan.is_saved ?? false
         ],
       );
 
       studyPlan.id = result.insertId;
 
       for (const week of studyPlan.weeks) {
-        const [weekResult] = await conn.query<ResultSetHeader>(
+        const [weekResult] = await conn.execute<ResultSetHeader>(
           "INSERT INTO study_plans_weeks (study_plan_id, week_number, title) VALUES (?, ?, ?)",
           [studyPlan.id, week.week_number, week.title],
         );
@@ -112,7 +112,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
     try {
       await conn.beginTransaction();
-      const [result] = await this.pool.query<ResultSetHeader>(
+      const [result] = await this.pool.execute<ResultSetHeader>(
         `DELETE FROM study_plans WHERE id = ?`,
         [planId],
       );
@@ -131,7 +131,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
   /* ---------------------- */
   /* -- HELPER FUNCTIONS -- */
   private async getStudyPlans(conn: PoolConnection, userId: number) {
-    const [result] = await conn.query<RowDataPacket[]>(
+    const [result] = await conn.execute<RowDataPacket[]>(
       `SELECT *
        FROM study_plans
        WHERE user_id = ?`,

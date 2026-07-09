@@ -10,7 +10,7 @@ import { IUserRepository } from './../domains/IUserRepository.js';
 
 export class UserRepository implements IUserRepository {
     async findByEmail(email: string): Promise<User | null> {
-        const [users] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE email = ?', [email]);
+        const [users] = await pool.execute<RowDataPacket[]>('SELECT * FROM users WHERE email = ?', [email]);
 
         const user = users[0];
 
@@ -20,7 +20,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async findById(id: number): Promise<User | null> {
-        const [users] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [id]);
+        const [users] = await pool.execute<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [id]);
 
         const user = users[0];
 
@@ -38,7 +38,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async getCurrentUser(id: number): Promise<User | null> {
-        const [users] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [id]);
+        const [users] = await pool.execute<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [id]);
 
         const user = users[0];
 
@@ -50,15 +50,15 @@ export class UserRepository implements IUserRepository {
 
     async save(user: User): Promise<void> {
         if (user.id) {
-            await pool.query('UPDATE users SET name = ?, email = ?, password_hash = ?, is_admin = ? WHERE id = ?', [user.name, user.email, user.getPassword, user.isAdmin, user.id]);
+            await pool.execute('UPDATE users SET name = ?, email = ?, password_hash = ?, is_admin = ? WHERE id = ?', [user.name, user.email, user.getPassword, user.isAdmin, user.id]);
         } else {
-            await pool.query('INSERT INTO users (name, email, password_hash, is_admin) VALUES (?, ?, ?, ?)', [user.name, user.email, user.getPassword, user.isAdmin]);
+            await pool.execute('INSERT INTO users (name, email, password_hash, is_admin) VALUES (?, ?, ?, ?)', [user.name, user.email, user.getPassword, user.isAdmin]);
         }
     }
 
     async delete(user: User): Promise<void> {
         if (user.id) {
-            await pool.query('DELETE FROM users WHERE id = ?', [user.id]);
+            await pool.execute('DELETE FROM users WHERE id = ?', [user.id]);
         }
     }
 }
