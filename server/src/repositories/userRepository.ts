@@ -16,7 +16,7 @@ export class UserRepository implements IUserRepository {
 
         if (!user) return null;
 
-        return new User(user.id, user.name, user.email, user.password_hash, user.isAdmin, user.createdAt, user.updatedAt);
+        return new User(user.id, user.name, user.email, user.password_hash, user.is_admin, user.created_at, user.updated_at);
     }
 
     async findById(id: number): Promise<User | null> {
@@ -26,14 +26,14 @@ export class UserRepository implements IUserRepository {
 
         if (!user) return null;
 
-        return new User(user.id, user.name, user.email, user.password_hash, user.isAdmin, user.createdAt, user.updatedAt);
+        return new User(user.id, user.name, user.email, user.password_hash, user.is_admin, user.created_at, user.updated_at);
     }
 
     async findAll(): Promise<User[]> {
         const [users] = await pool.query<RowDataPacket[]>('SELECT * FROM users');
 
         return users.map(
-            (userRow) => new User(userRow.id, userRow.name, userRow.email, userRow.password_hash, userRow.isAdmin, userRow.createdAt, userRow.updatedAt) 
+            (userRow) => new User(userRow.id, userRow.name, userRow.email, userRow.password_hash, userRow.is_admin, userRow.created_at, userRow.updated_at) 
         )
     }
 
@@ -44,7 +44,7 @@ export class UserRepository implements IUserRepository {
 
         if (!user) return null;
 
-        return new User(user.id, user.name, user.email, user.password_hash, user.isAdmin, user.createdAt, user.updatedAt);
+        return new User(user.id, user.name, user.email, user.password_hash, user.is_admin, user.created_at, user.updated_at);
 
     }
 
