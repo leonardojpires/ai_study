@@ -40,9 +40,11 @@ export class StudyPlanController {
   };
 
   deletePlan = async (req: Request, res: Response) => {
+    const userId = this.getUserId(req);
+    if (!userId) return res.status(401).json({ message: "Unauthorized." });
     try {
         const planId = Number(req.params.id);
-        await this.studyPlanService.deletePlan(planId);
+        await this.studyPlanService.deletePlan(planId, userId);
 
         return res.status(204).send();
     } catch (error: any) {
