@@ -107,14 +107,14 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     }
   }
 
-  async deletePlan(planId: number): Promise<number> {
+  async deletePlan(planId: number, userId: number): Promise<number> {
     const conn = await this.pool.getConnection();
 
     try {
       await conn.beginTransaction();
       const [result] = await this.pool.execute<ResultSetHeader>(
-        `DELETE FROM study_plans WHERE id = ?`,
-        [planId],
+        `DELETE FROM study_plans WHERE id = ? AND user_id = ?`,
+        [planId, userId],
       );
 
       await conn.commit();

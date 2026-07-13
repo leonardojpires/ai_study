@@ -23,8 +23,8 @@ export class StudyPlanService {
         return studyPlans;
     }
 
-    async deletePlan(planId: number) {
-        const affectedRows = await this.studyPlanRepository.deletePlan(planId);
+    async deletePlan(planId: number, userId: number) {
+        const affectedRows = await this.studyPlanRepository.deletePlan(planId, userId);
 
         if (affectedRows === 0) throw new Error("Study plan not found.");
     }
