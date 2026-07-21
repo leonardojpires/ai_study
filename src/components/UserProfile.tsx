@@ -16,6 +16,10 @@ interface UserProfileProps {
   error: string | null;
 }
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "An unexpected error occurred.";
+}
+
 export function UserProfile({ user, isLoading, error }: UserProfileProps) {
   const { showToast } = useToast();
   const initials =
@@ -54,10 +58,10 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
           setPlans([]);
           setPlansError("Could not load your saved plans.");
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (cancelled) return;
         setPlans([]);
-        setPlansError(err?.message || "Could not load your saved plans.");
+        setPlansError(getErrorMessage(err));
       } finally {
         if (!cancelled) {
           setPlansLoading(false);
@@ -111,9 +115,9 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
         message: "Your library has been updated.",
         tone: "success",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       setPlans(previousPlans);
-      const message = err?.message || "Failed to remove the plan. Please try again.";
+      const message = getErrorMessage(err);
       setRemoveError(message);
       showToast({
         title: "Could not remove plan",

@@ -1,8 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 
-type AuthenticatedRequest = Request & { user: any };
-
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies?.[process.env.COOKIE_NAME ?? "auth_token"];
 
@@ -14,7 +12,10 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET ?? "");
-        (req as AuthenticatedRequest).user = decoded;
+        if (typeof decoded === "string" || typeof decoded.sub !== "number") {
+            return res.status(403).json({ message: "Forbidden. Invalid token payload." });
+        }
+        req.user = { sub: decoded.sub };
         
         next();
     } catch(err) {

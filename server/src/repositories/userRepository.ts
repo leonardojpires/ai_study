@@ -1,7 +1,17 @@
-import { RowDataPacket } from 'mysql2';
+import type { RowDataPacket } from 'mysql2/promise';
 import { pool } from '../database/db.js';
 import { User } from '../domains/User.js';
-import { IUserRepository } from './../domains/IUserRepository.js';
+import { IUserRepository } from './IUserRepository.js';
+
+interface UserRow extends RowDataPacket {
+    id: number;
+    name: string;
+    email: string;
+    password_hash: string;
+    is_admin: boolean;
+    created_at: Date;
+    updated_at: Date;
+}
 
 /* 
     pool is the connection to the database
@@ -10,7 +20,7 @@ import { IUserRepository } from './../domains/IUserRepository.js';
 
 export class UserRepository implements IUserRepository {
     async findByEmail(email: string): Promise<User | null> {
-        const [users] = await pool.execute<RowDataPacket[]>('SELECT * FROM users WHERE email = ?', [email]);
+        const [users] = await pool.execute<UserRow[]>('SELECT * FROM users WHERE email = ?', [email]);
 
         const user = users[0];
 
@@ -20,7 +30,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async findById(id: number): Promise<User | null> {
-        const [users] = await pool.execute<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [id]);
+        const [users] = await pool.execute<UserRow[]>('SELECT * FROM users WHERE id = ?', [id]);
 
         const user = users[0];
 
@@ -30,7 +40,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async findAll(): Promise<User[]> {
-        const [users] = await pool.query<RowDataPacket[]>('SELECT * FROM users');
+        const [users] = await pool.query<UserRow[]>('SELECT * FROM users');
 
         return users.map(
             (userRow) => new User(userRow.id, userRow.name, userRow.email, userRow.password_hash, userRow.is_admin, userRow.created_at, userRow.updated_at) 
@@ -38,7 +48,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async getCurrentUser(id: number): Promise<User | null> {
-        const [users] = await pool.execute<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [id]);
+        const [users] = await pool.execute<UserRow[]>('SELECT * FROM users WHERE id = ?', [id]);
 
         const user = users[0];
 

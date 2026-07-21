@@ -1,9 +1,37 @@
-import { PoolConnection, ResultSetHeader } from "mysql2";
-import { Pool, RowDataPacket } from "mysql2/promise";
-// Use the promise-based Pool type so query() returns a Promise<[result, fields]> tuple instead of a Query stream.
-import { IStudyPlanRepository } from "../repositories/IStudyPlanRepository.js";
-import { StudyPlan } from "./../domains/StudyPlan.js";
+import type {
+  Pool,
+  PoolConnection,
+  ResultSetHeader,
+  RowDataPacket,
+} from "mysql2/promise";
+import { IStudyPlanRepository } from "./IStudyPlanRepository.js";
+import { StudyPlan } from "../domains/StudyPlan.js";
 import { StudyPlanWeek } from "../domains/StudyPlanWeek.js"; 
+
+interface StudyPlanRow extends RowDataPacket {
+  id: number;
+  user_id: number;
+  title: string;
+  description: string;
+  created_at: Date;
+}
+
+interface StudyPlanWeekRow extends RowDataPacket {
+  id: number;
+  study_plan_id: number;
+  week_number: number;
+  title: string;
+}
+
+interface StudyPlanWeekObjectiveRow extends RowDataPacket {
+  study_plan_week_id: number;
+  objective: string;
+}
+
+interface StudyPlanWeekTopicRow extends RowDataPacket {
+  study_plan_week_id: number;
+  topic: string;
+}
 
 export class StudyPlanRepository implements IStudyPlanRepository {
   constructor(private pool: Pool) {}
@@ -38,7 +66,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     try {
       await conn.beginTransaction();
 
-      const [result, _] = await conn.execute<ResultSetHeader>(
+      const [result] = await conn.execute<ResultSetHeader>(
         "INSERT INTO study_plans (user_id, title, description, is_saved) VALUES (?, ?, ?, ?)",
         [
           studyPlan.user_id,
@@ -112,7 +140,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
     try {
       await conn.beginTransaction();
-      const [result] = await this.pool.execute<ResultSetHeader>(
+      const [result] = await conn.execute<ResultSetHeader>(
         `DELETE FROM study_plans WHERE id = ? AND user_id = ?`,
         [planId, userId],
       );
@@ -121,7 +149,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
       return result.affectedRows;
     } catch (err) {
-      conn.rollback();
+      await conn.rollback();
       throw err;
     } finally {
       conn.release();
@@ -130,8 +158,8 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
   /* ---------------------- */
   /* -- HELPER FUNCTIONS -- */
-  private async getStudyPlans(conn: PoolConnection, userId: number) {
-    const [result] = await conn.execute<RowDataPacket[]>(
+  private async getStudyPlans(conn: PoolConnection, userId: number): Promise<StudyPlanRow[]> {
+    const [result] = await conn.execute<StudyPlanRow[]>(
       `SELECT *
        FROM study_plans
        WHERE user_id = ?`,
@@ -141,10 +169,10 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     return result;
   }
 
-  private async getWeeks(conn: PoolConnection, plans: RowDataPacket[]) {
+  private async getWeeks(conn: PoolConnection, plans: StudyPlanRow[]): Promise<StudyPlanWeekRow[]> {
     const planIds = plans.map((plan) => plan.id);
 
-    const [result] = await conn.query<RowDataPacket[]>(
+    const [result] = await conn.query<StudyPlanWeekRow[]>(
       `SELECT *
          FROM study_plans_weeks
          WHERE study_plan_id IN (?)`,
@@ -156,13 +184,13 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
   private async getWeeksObjectives(
     conn: PoolConnection,
-    weeks: RowDataPacket[],
-  ) {
+    weeks: StudyPlanWeekRow[],
+  ): Promise<StudyPlanWeekObjectiveRow[]> {
     const weekIds = weeks.map((week) => week.id);
 
     if (weekIds.length === 0) return [];
 
-    const result = await conn.query<RowDataPacket[]>(
+    const [result] = await conn.query<StudyPlanWeekObjectiveRow[]>(
       `SELECT *
        FROM study_plans_week_objectives
        WHERE study_plan_week_id IN (?)`,
@@ -172,12 +200,12 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     return result;
   }
 
-  private async getWeeksTopics(conn: PoolConnection, weeks: RowDataPacket[]) {
+  private async getWeeksTopics(conn: PoolConnection, weeks: StudyPlanWeekRow[]): Promise<StudyPlanWeekTopicRow[]> {
     const weekIds = weeks.map((week) => week.id);
 
     if (weekIds.length === 0) return [];
 
-    const result = await conn.query<RowDataPacket[]>(
+    const [result] = await conn.query<StudyPlanWeekTopicRow[]>(
       `SELECT *
        FROM study_plans_week_topics
        WHERE study_plan_week_id IN (?)`,
@@ -187,7 +215,12 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     return result;
   }
 
-  private buildStudyPlans(plans, weeks, objectives, topics) {
+  private buildStudyPlans(
+    plans: StudyPlanRow[],
+    weeks: StudyPlanWeekRow[],
+    objectives: StudyPlanWeekObjectiveRow[],
+    topics: StudyPlanWeekTopicRow[],
+  ): StudyPlan[] {
     const objectivesByWeekId = this.groupObjectivesByWeekId(objectives);
 
     const topicsByWeekId = this.groupTopicsByWeekId(topics);
@@ -210,7 +243,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     });
   }
 
-  private groupObjectivesByWeekId(objectives: RowDataPacket[]) {
+  private groupObjectivesByWeekId(objectives: StudyPlanWeekObjectiveRow[]): Map<number, string[]> {
     const map = new Map<number, string[]>();
 
     for (const objective of objectives) {
@@ -224,7 +257,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     return map;
   }
 
-  private groupTopicsByWeekId(topics: RowDataPacket[]) {
+  private groupTopicsByWeekId(topics: StudyPlanWeekTopicRow[]): Map<number, string[]> {
     const map = new Map<number, string[]>();
 
     for (const topic of topics) {
@@ -239,10 +272,10 @@ export class StudyPlanRepository implements IStudyPlanRepository {
   }
 
   private groupWeeksByPlanId(
-    weeks: RowDataPacket[],
+    weeks: StudyPlanWeekRow[],
     objectivesByWeekId: Map<number, string[]>,
     topicsByWeekId: Map<number, string[]>,
-  ) {
+  ): Map<number, StudyPlanWeek[]> {
     const map = new Map<number, StudyPlanWeek[]>();
 
     for (const week of weeks) {

@@ -22,7 +22,7 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
         message: "Forbidden.",
       });
     next();
-  } catch (err: any) {
+  } catch (err: unknown) {
     return res.status(403).json({
       message: "Forbidden. Invalid or expired token."
     });

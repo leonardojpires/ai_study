@@ -5,6 +5,7 @@ import {
   CreateStudyPlanDTO,
   CreateStudyPlanWeekDTO,
 } from "../dtos/StudyPlanDTO.js";
+import { getErrorMessage } from "../utils/errors.js";
 
 type AuthenticatedRequest = Request & { user?: { sub?: number } };
 
@@ -30,7 +31,7 @@ export class GroqController {
   private isValidWeek = (week: unknown): week is CreateStudyPlanWeekDTO => {
     if (typeof week !== "object" || week === null) return false;
 
-    const candidate = week as any;
+    const candidate = week as Record<string, unknown>;
     return (
       typeof candidate.week_number === "number" &&
       this.isString(candidate.title) &&
@@ -44,12 +45,12 @@ export class GroqController {
   ): payload is CreateStudyPlanDTO => {
     if (typeof payload !== "object" || payload === null) return false;
 
-    const body = payload as CreateStudyPlanDTO;
+    const body = payload as Record<string, unknown>;
 
     if (!this.isString(body.title)) return false;
     if (body.description != null && !this.isString(body.description))
       return false;
-    if (body.weeks != null) {
+    if (body.weeks !== undefined) {
       if (!Array.isArray(body.weeks) || !body.weeks.every(this.isValidWeek))
         return false;
     }
@@ -88,9 +89,9 @@ export class GroqController {
       }
 
       return res.status(200).json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       return res.status(500).json({
-        message: error?.message ?? "Failed to process Groq conversation",
+        message: getErrorMessage(error),
       });
     }
   };
@@ -112,9 +113,9 @@ export class GroqController {
         success: true,
         studyPlan,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       return res.status(500).json({
-        message: error?.message ?? "Failed to persist study plan with Groq",
+        message: getErrorMessage(error),
       });
     }
   };

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { StudyPlanService } from "../services/studyPlanService.js";
+import { getErrorMessage } from "../utils/errors.js";
 
 type AuthenticatedRequest = Request & { user?: { sub?: number } };
 
@@ -18,8 +19,8 @@ export class StudyPlanController {
         success: true,
         studyPlan: result,
       });
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+    } catch (error: unknown) {
+      return res.status(500).json({ message: getErrorMessage(error) });
     }
   };
 
@@ -34,8 +35,8 @@ export class StudyPlanController {
         success: true,
         plans: result,
       });
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+    } catch (error: unknown) {
+      return res.status(500).json({ message: getErrorMessage(error) });
     }
   };
 
@@ -47,8 +48,8 @@ export class StudyPlanController {
         await this.studyPlanService.deletePlan(planId, userId);
 
         return res.status(204).send();
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+    } catch (error: unknown) {
+      return res.status(500).json({ message: getErrorMessage(error) });
     }
   };
 
