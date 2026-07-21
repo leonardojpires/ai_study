@@ -1,7 +1,8 @@
-import { IUserRepository } from "../domains/IUserRepository.js";
+import { IUserRepository } from "../repositories/IUserRepository.js";
 import { User } from "../domains/User.js";
 import bcrypt from 'bcrypt';
-
+import { buildToken } from "../jwt/jwt_build.js";
+import { Response } from "express";
 
 export class AuthService {
     constructor(private userRepository: IUserRepository) {}
@@ -11,19 +12,24 @@ export class AuthService {
         if (!email.includes("@")) throw new Error("Invalid email.");
         if (password.length < 6) throw new Error("Password must be at least 6 characters.");
 
-        const user = await this.userRepository.findByEmail(email);
-
-        if (user) throw new Error('User already exists.');
+        const existingUser = await this.userRepository.findByEmail(email);
+        if (existingUser) throw new Error('This e-mail has already been taken.');
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const newUser = new User(undefined, name, email, hashedPassword, false, new Date(), new Date());
 
         await this.userRepository.save(newUser);
 
+        const createdUser = await this.userRepository.findByEmail(email);
+        if (!createdUser) throw new Error('User not created.');
+        if (!createdUser.id) throw new Error('User not created.');
+
+        const token = buildToken(createdUser.id);
+
         return {
             success: true,
-            newUser
+            user: newUser,
+            token
         }
     }
 
@@ -32,16 +38,30 @@ export class AuthService {
         if (!email.includes("@")) throw new Error("Invalid email.");
 
         const user = await this.userRepository.findByEmail(email);
-
         if (!user) throw new Error("This user does not exist.");
+        if (!user.id) throw new Error("This user does not exist.");
 
         const isPasswordValid = await user.checkPassword(password);
+        if (!isPasswordValid) throw new Error("Invalid password.");
+
+        const token = buildToken(user.id);
 
         if (!isPasswordValid) throw new Error("Invalid password.");
 
         return {
             success: true,
-            user
+            user,
+            token
         }
+    }
+
+    async logout(res: Response) {
+        const cookieName = process.env.COOKIE_NAME || "auth_token";
+        res.clearCookie(cookieName, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            path: "/"
+        });
     }
 }

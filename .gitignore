@@ -7,3 +7,7 @@ dist
 /server/tests/
 /tests/
 server/tests/auth.test.ts
+
+/server/src/scripts
+/PROJECT_AUDIT.md
+.github/workflows/pipeline.yaml

@@ -24,3 +24,26 @@ export interface StudyPlanResponse {
   summary: string;
   weeks: WeekItem[];
 }
+
+export interface SavedPlanWeek {
+  week_number: number;
+  title: string;
+  objectives: string[];
+  topics: string[];
+}
+
+export interface SavedPlan {
+  id: number;
+  title: string;
+  description: string;
+  is_saved?: boolean;
+  weeks: SavedPlanWeek[];
+  user_id: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SavedPlansResponse {
+  success: boolean;
+  plans: SavedPlan[];
+}

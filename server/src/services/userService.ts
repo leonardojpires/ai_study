@@ -1,9 +1,7 @@
 import { UserRepository } from "../repositories/userRepository.js";
+import { IUserService } from "./IUserService.js";
 
-
-
-
-export class UserService {
+export class UserService implements IUserService {
     constructor(private userRepository: UserRepository) {}
 
     async getAllUsers() {
@@ -16,6 +14,14 @@ export class UserService {
 
     async getUserById(id: number) {
         const user = await this.userRepository.findById(id);
+
+        if (!user) throw new Error("User not found.");
+
+        return user;
+    }
+
+    async getCurrentUser(id: number) {
+        const user = await this.userRepository.getCurrentUser(id);
 
         if (!user) throw new Error("User not found.");
 

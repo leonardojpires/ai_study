@@ -1,6 +1,8 @@
 import { UserService } from "../services/userService.js";
 import { Request, Response } from 'express';
 
+type AuthenticatedRequest = Request & { user?: { sub?: number } };
+
 export class UserController {
     constructor(private userService: UserService) {}
 
@@ -24,6 +26,26 @@ export class UserController {
             const { id } = req.params;
 
             const result = await this.userService.getUserById(Number(id));
+
+            return res.status(200).json({
+                success: true,
+                user: result.toSafeObject()
+            });
+        } catch(err: any) {
+            return res.status(404).json({ message: err.message });
+        }
+    }
+
+    getCurrentUser = async (req: Request, res: Response) => {
+        try {
+            const authenticatedReq = req as AuthenticatedRequest;
+            const userId = authenticatedReq.user?.sub;
+
+            if (!userId) {
+                throw new Error('User not authenticated.');
+            }
+
+            const result = await this.userService.getCurrentUser(Number(userId));
 
             return res.status(200).json({
                 success: true,

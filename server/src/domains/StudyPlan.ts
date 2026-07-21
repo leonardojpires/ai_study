@@ -1,34 +1,50 @@
-import { User } from "./User.js";
+import { CreateStudyPlanDTO } from "../dtos/StudyPlanDTO.js";
+import { StudyPlanWeek } from "./StudyPlanWeek.js";
+
+type StudyPlanProps = {
+    id?: number | undefined;
+    title: string;
+    description?: string | undefined;
+    is_saved?: boolean | undefined;
+    weeks?: StudyPlanWeek[];
+    user_id?: number | undefined;
+    createdAt?: Date | undefined;
+    updatedAt?: Date | undefined;
+}
 
 export class StudyPlan {
     id?: number | undefined;
     title: string;
-    description: string;
+    description?: string | undefined;
+    is_saved?: boolean | undefined;
+    weeks: StudyPlanWeek[] = [];
+    user_id?: number | undefined;
     createdAt?: Date | undefined;
     updatedAt?: Date | undefined;
-    user?: User | undefined;
 
-    constructor(
-        id: number | undefined,
-        title: string,
-        description: string,
-        createdAt: Date | undefined,
-        updatedAt: Date | undefined,
-        user: User | undefined
-    ) {
-        this.id = id ?? undefined;
-        this.title = title;
-        this.description = description;
-        this.createdAt = createdAt ?? undefined;
-        this.updatedAt = updatedAt ?? undefined;
-        this.user = user ?? undefined;
+    constructor(props: StudyPlanProps) {
+        this.id = props.id;
+        this.title = props.title;
+        this.description = props.description ?? "";
+        this.is_saved = props.is_saved;
+        this.weeks = props.weeks ?? [];
+        this.user_id = props.user_id;
+        this.createdAt = props.createdAt;
+        this.updatedAt = props.updatedAt;
     }
 
-    static create(title: string, description: string, user: User): StudyPlan { 
-        return new StudyPlan(undefined, title, description, undefined, undefined, user);
-    }
-
-    static update(title: string, description: string): StudyPlan {
-        return new StudyPlan(undefined, title, description, undefined, undefined, undefined);
+    static generate(dto: CreateStudyPlanDTO, userId: number): StudyPlan { 
+        return new StudyPlan({
+            title: dto.title,
+            description: dto.description ?? "",
+            is_saved: dto.is_saved ?? false,
+            weeks: (dto.weeks ?? []).map(week => new StudyPlanWeek({
+                week_number: week.week_number,
+                title: week.title,
+                objectives: week.objectives,
+                topics: week.topics
+            })),
+            user_id: userId
+        });
     }
 }
