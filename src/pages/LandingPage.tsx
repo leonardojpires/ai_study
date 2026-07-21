@@ -20,11 +20,25 @@ const features = [
   },
 ];
 
-const weeks = [
-  "Foundations and setup",
-  "Guided practice",
-  "Project sprint",
-  "Review and next steps",
+const previewWeeks = [
+  {
+    week_number: 1,
+    title: "React Foundations",
+    objectives: ["Understand components", "Practice state and props"],
+    topics: ["JSX", "Hooks", "Component structure"],
+  },
+  {
+    week_number: 2,
+    title: "Portfolio Project",
+    objectives: ["Build reusable sections", "Connect data to UI"],
+    topics: ["Forms", "Routing", "Project layout"],
+  },
+  {
+    week_number: 3,
+    title: "Review and Polish",
+    objectives: ["Refactor weak spots", "Prepare next steps"],
+    topics: ["Accessibility", "Deployment", "Code review"],
+  },
 ];
 
 export function LandingPage() {
@@ -60,8 +74,8 @@ export function LandingPage() {
   }
 
   return (
-    <main className="landing-page min-h-screen overflow-hidden text-[var(--text)]">
-      <header className="landing-nav mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+    <main className="landing-page h-[100svh] overflow-hidden text-[var(--text)]">
+      <header className="landing-nav mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="brand-lockup" aria-label="Blueprint home">
           <BrandMark />
         </Link>
@@ -131,13 +145,13 @@ export function LandingPage() {
         </nav>
       </header>
 
-      <section className="mx-auto grid min-h-[calc(100vh-5.5rem)] w-full max-w-7xl items-center gap-10 px-4 pb-12 pt-6 sm:px-6 lg:grid-cols-[1fr_0.92fr] lg:px-8">
-        <div className="max-w-3xl">
+      <section className="landing-hero mx-auto grid h-[calc(100svh-5rem)] w-full max-w-7xl items-center gap-8 px-4 pb-5 sm:px-6 lg:grid-cols-[0.95fr_0.86fr] lg:px-8">
+        <div className="hero-copy max-w-3xl">
           <p className="eyebrow">Personal AI study roadmap</p>
-          <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.98] tracking-normal text-[var(--text)] sm:text-6xl lg:text-7xl">
-            Study plans that feel structured, human, and ready to follow.
+          <h1 className="mt-4 max-w-4xl text-4xl font-black leading-[0.98] tracking-normal text-[var(--text)] sm:text-5xl lg:text-6xl">
+            Study plans that feel structured, human, and ready to follow
           </h1>
-          <p className="!mt-4 max-w-2xl text-lg leading-8 text-[var(--text-muted)]">
+          <p className="!mt-4 max-w-2xl text-base leading-7 text-[var(--text-muted)] sm:text-lg">
             Build a weekly learning path from a simple conversation using Blueprint. Keep the
             friendly green style, add a little glass, and make planning feel
             calmer than a blank document.
@@ -152,7 +166,7 @@ export function LandingPage() {
             </Link>
           </div>
 
-          <div className="mt-10 grid max-w-2xl gap-3 sm:grid-cols-3">
+          <div className="landing-feature-grid mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
             {features.map((feature) => (
               <article key={feature.title} className="glass-tile">
                 <h2>{feature.title}</h2>
@@ -168,23 +182,40 @@ export function LandingPage() {
             <span />
             <span />
           </div>
-          <div className="preview-message preview-message-user">
-            I have 4 weeks to learn React and build a portfolio project.
-          </div>
-          <div className="preview-message preview-message-ai">
-            Great. I will shape this into a practical weekly plan with review
-            loops and a final project checkpoint.
-          </div>
           <div className="preview-plan">
             <div>
-              <p className="preview-label">Generated roadmap</p>
+              <p className="preview-label">Plan preview</p>
               <h2>React Portfolio Sprint</h2>
+              <p className="preview-description">
+                A focused roadmap for learning React fundamentals while building
+                a portfolio-ready project.
+              </p>
             </div>
             <div className="preview-week-list">
-              {weeks.map((week, index) => (
-                <div key={week} className="preview-week">
-                  <span>{index + 1}</span>
-                  <p>{week}</p>
+              {previewWeeks.map((week) => (
+                <div key={week.week_number} className="preview-week-card">
+                  <div className="preview-week-head">
+                    <span>Week {week.week_number}</span>
+                    <p>{week.title}</p>
+                  </div>
+                  <div className="preview-week-columns">
+                    <div>
+                      <p className="preview-column-label">Objectives</p>
+                      <ul>
+                        {week.objectives.map((objective) => (
+                          <li key={objective}>{objective}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="preview-column-label">Topics</p>
+                      <div className="preview-topic-list">
+                        {week.topics.map((topic) => (
+                          <span key={topic}>{topic}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
