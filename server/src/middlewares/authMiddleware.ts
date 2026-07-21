@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies?.[process.env.COOKIE_NAME ?? "auth_token"];
+    const token = req.cookies?.[process.env.COOKIE_NAME || "auth_token"];
 
     if (!token) {
         return res.status(401).json({

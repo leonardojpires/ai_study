@@ -115,12 +115,13 @@ export async function logoutUser(): Promise<void> {
 export async function createStudyPlan(
   payload: StudyPlanRequest,
 ): Promise<StudyPlanResponse> {
-  const response = await fetch(`${API_BASE_URL}/study-plan`, {
+  const response = await fetch(`${API_BASE_URL}/study-plan/generate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
+    credentials: "include",
   });
 
   return parseJsonResponse<StudyPlanResponse>(response);
@@ -164,6 +165,7 @@ export async function converse(messages: ChatMessage[]): Promise<GroqResponse> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ messages }),
+    credentials: "include",
   });
 
   return parseJsonResponse<GroqResponse>(response);
@@ -186,6 +188,7 @@ export async function persistGroqPlan(plan: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ ...plan }),
+    credentials: "include",
   });
 
   return parseJsonResponse(response);

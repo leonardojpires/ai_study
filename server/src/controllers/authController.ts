@@ -3,7 +3,7 @@ import { AuthService } from "../services/authService.js";
 import { buildCookieOptions } from "../jwt/jwt_build.js";
 import { getErrorMessage } from "../utils/errors.js";
 
-const COOKIE_NAME = process.env.COOKIE_NAME || "";
+const COOKIE_NAME = process.env.COOKIE_NAME || "auth_token";
 
 const cookieOptions = buildCookieOptions();
 
