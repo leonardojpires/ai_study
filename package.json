@@ -3,10 +3,13 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "workspaces": [
+    "server"
+  ],
   "scripts": {
     "dev": "vite",
     "server": "cd server && tsx watch src/server.ts",
-    "build": "tsc -b && vite build",
+    "build": "npm --workspace server run build && tsc -p tsconfig.app.json && tsc -p tsconfig.node.json --noEmit && vite build --config vite.config.ts",
     "preview": "vite preview"
   },
   "dependencies": {

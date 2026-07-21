@@ -1,6 +1,3 @@
-import { StudyPlanWeekObjective } from "./StudyPlanWeekObjective.js";
-import { StudyPlanWeekTopic } from "./StudyPlanWeekTopic.js";
-
 type StudyPlanWeekProps = {
     id?: number;
     study_plan_id?: number;

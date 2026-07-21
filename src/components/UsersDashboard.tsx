@@ -84,10 +84,10 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <p className="eyebrow">Admin</p>
-          <h2 className="mt-1 text-xl font-black text-[var()]">Users Dashboard</h2>
-          <p className="text-sm text-[var(-muted)]">Manage user accounts with mocked data (no backend calls).</p>
+          <h2 className="mt-1 text-xl font-black text-[var(--text)]">Users Dashboard</h2>
+          <p className="text-sm text-[var(--text-muted)]">Manage user accounts with mocked data (no backend calls).</p>
         </div>
-        <button onClick={onBack} className="rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2 text-sm font-bold text-[var(-muted)] hover:bg-white">Back to app</button>
+        <button onClick={onBack} className="rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2 text-sm font-bold text-[var(--text-muted)] hover:bg-white">Back to app</button>
       </div>
 
       <div className="mb-6">
@@ -137,12 +137,12 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
       </div>
 
       <form className="mt-6 space-y-3" onSubmit={handleAddUser}>
-        <h3 className="font-bold text-[var()]">Add New Mock User</h3>
+        <h3 className="font-bold text-[var(--text)]">Add New Mock User</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input className="rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2" placeholder="Name" value={newName} onChange={e => setNewName(e.target.value)} />
           <input className="rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2" placeholder="Email" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} />
           <input className="rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2" placeholder="Password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
-          <label className="flex items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2 text-sm text-[var(-muted)]">
+          <label className="flex items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2 text-sm text-[var(--text-muted)]">
             <input type="checkbox" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
             Is Admin
           </label>

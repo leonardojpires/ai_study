@@ -1,5 +1,6 @@
 import { UserService } from "../services/userService.js";
 import { Request, Response } from 'express';
+import { getErrorMessage } from "../utils/errors.js";
 
 type AuthenticatedRequest = Request & { user?: { sub?: number } };
 
@@ -16,8 +17,8 @@ export class UserController {
                 success: true,
                 users
             });
-        } catch(err: any) {
-            return res.status(500).json({ message: err.message });
+        } catch(err: unknown) {
+            return res.status(500).json({ message: getErrorMessage(err) });
         }
     }
 
@@ -31,8 +32,8 @@ export class UserController {
                 success: true,
                 user: result.toSafeObject()
             });
-        } catch(err: any) {
-            return res.status(404).json({ message: err.message });
+        } catch(err: unknown) {
+            return res.status(404).json({ message: getErrorMessage(err) });
         }
     }
 
@@ -51,8 +52,8 @@ export class UserController {
                 success: true,
                 user: result.toSafeObject()
             });
-        } catch(err: any) {
-            return res.status(404).json({ message: err.message });
+        } catch(err: unknown) {
+            return res.status(404).json({ message: getErrorMessage(err) });
         }
     }
 }
