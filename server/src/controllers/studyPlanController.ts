@@ -19,7 +19,7 @@ export class StudyPlanController {
         studyPlan: result,
       });
     } catch (error: unknown) {
-      console.error("Failed to generate study plan:", error);
+      // console.error("Failed to generate study plan:", error);
       return res.status(500).json({
         message: "We couldn't create your study plan. Please try again.",
       });
@@ -38,7 +38,7 @@ export class StudyPlanController {
         plans: result,
       });
     } catch (error: unknown) {
-      console.error("Failed to retrieve study plans:", error);
+      // console.error("Failed to retrieve study plans:", error);
       return res.status(500).json({
         message: "We couldn't load your study plans. Please try again.",
       });
@@ -54,7 +54,7 @@ export class StudyPlanController {
 
         return res.status(204).send();
     } catch (error: unknown) {
-      console.error("Failed to delete study plan:", error);
+      // console.error("Failed to delete study plan:", error);
       return res.status(500).json({
         message: "We couldn't remove the study plan. Please try again.",
       });

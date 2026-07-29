@@ -90,7 +90,7 @@ export class GroqController {
 
       return res.status(200).json(result);
     } catch (error: unknown) {
-      console.error("Study plan conversation failed:", error);
+      // console.error("Study plan conversation failed:", error);
       return res.status(500).json({
         message: "We couldn't process your request. Please try again.",
       });
@@ -116,7 +116,7 @@ export class GroqController {
         studyPlan,
       });
     } catch (error: unknown) {
-      console.error("Failed to save study plan:", error);
+      // console.error("Failed to save study plan:", error);
       return res.status(500).json({
         message: "We couldn't save your study plan. Please try again.",
       });
