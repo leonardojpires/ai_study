@@ -5,7 +5,6 @@ import {
   CreateStudyPlanDTO,
   CreateStudyPlanWeekDTO,
 } from "../dtos/StudyPlanDTO.js";
-import { getErrorMessage } from "../utils/errors.js";
 
 type AuthenticatedRequest = Request & { user?: { sub?: number } };
 
@@ -64,13 +63,14 @@ export class GroqController {
       const authReq = req as AuthenticatedRequest;
 
       const userId = authReq.user?.sub;
-      if (!userId) return res.status(401).json({ message: "Unauthorized." });
+      if (!userId)
+        return res.status(401).json({ message: "Please sign in to continue." });
 
       const { messages } = req.body as { messages?: ChatMessage[] };
 
       if (!Array.isArray(messages)) {
         return res.status(400).json({
-          message: "Missing messages in request body",
+          message: "Please provide a valid conversation.",
         });
       }
 
@@ -80,7 +80,7 @@ export class GroqController {
         if (!this.isValidStudyPlanPayload(result.plan)) {
           return res
             .status(422)
-            .json({ message: "Groq returned invalid plan data." });
+            .json({ message: "We couldn't prepare a valid study plan. Please try again." });
         }
 
         return res.status(200).json({
@@ -90,8 +90,9 @@ export class GroqController {
 
       return res.status(200).json(result);
     } catch (error: unknown) {
+      console.error("Study plan conversation failed:", error);
       return res.status(500).json({
-        message: getErrorMessage(error),
+        message: "We couldn't process your request. Please try again.",
       });
     }
   };
@@ -100,11 +101,12 @@ export class GroqController {
     try {
       const authReq = req as AuthenticatedRequest;
       const userId = authReq.user?.sub;
-      if (!userId) return res.status(401).json({ message: "Unauthorized." });
+      if (!userId)
+        return res.status(401).json({ message: "Please sign in to continue." });
       const payload = req.body;
       if (!this.isValidStudyPlanPayload(payload)) {
         return res.status(400).json({
-          message: "Invalid study plan payload.",
+          message: "Please provide a valid study plan.",
         });
       }
       const studyPlan = await this.studyPlanService.generate(payload, userId);
@@ -114,8 +116,9 @@ export class GroqController {
         studyPlan,
       });
     } catch (error: unknown) {
+      console.error("Failed to save study plan:", error);
       return res.status(500).json({
-        message: getErrorMessage(error),
+        message: "We couldn't save your study plan. Please try again.",
       });
     }
   };

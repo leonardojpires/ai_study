@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/authService.js";
 import { buildCookieOptions } from "../jwt/jwt_build.js";
-import { getErrorMessage } from "../utils/errors.js";
 
 const COOKIE_NAME = process.env.COOKIE_NAME || "auth_token";
 
@@ -22,7 +21,10 @@ export class AuthController {
                 user: result.user.toSafeObject()
             });
         } catch(error: unknown) {
-            return res.status(400).json({ message: getErrorMessage(error) });
+            console.error("Account registration failed:", error);
+            return res.status(400).json({
+                message: "We couldn't create your account. Please check your details and try again."
+            });
         }
     }
 
@@ -38,7 +40,10 @@ export class AuthController {
                 user: result.user.toSafeObject()
             });
         } catch(error: unknown) {
-            return res.status(401).json({ message: getErrorMessage(error) });
+            console.error("Login failed:", error);
+            return res.status(401).json({
+                message: "The email or password is incorrect."
+            });
         }
     }
 
@@ -54,7 +59,10 @@ export class AuthController {
                 success: true 
             });
         } catch(error: unknown) {
-            return res.status(500).json({ message: getErrorMessage(error) });
+            console.error("Logout failed:", error);
+            return res.status(500).json({
+                message: "We couldn't log you out. Please try again."
+            });
         }
     }
 }

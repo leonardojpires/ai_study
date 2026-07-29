@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { StudyPlanService } from "../services/studyPlanService.js";
-import { getErrorMessage } from "../utils/errors.js";
 
 type AuthenticatedRequest = Request & { user?: { sub?: number } };
 
@@ -10,7 +9,7 @@ export class StudyPlanController {
   generate = async (req: Request, res: Response) => {
     try {
       const userId = this.getUserId(req);
-      if (!userId) return res.status(401).json({ message: "Unauthorized." });
+      if (!userId) return res.status(401).json({ message: "Please sign in to continue." });
 
       const result = await this.studyPlanService.generate(req.body, userId);
 
@@ -20,14 +19,17 @@ export class StudyPlanController {
         studyPlan: result,
       });
     } catch (error: unknown) {
-      return res.status(500).json({ message: getErrorMessage(error) });
+      console.error("Failed to generate study plan:", error);
+      return res.status(500).json({
+        message: "We couldn't create your study plan. Please try again.",
+      });
     }
   };
 
   getPlansByUserId = async (req: Request, res: Response) => {
     try {
       const userId = this.getUserId(req);
-      if (!userId) return res.status(401).json({ message: "Unauthorized." });
+      if (!userId) return res.status(401).json({ message: "Please sign in to continue." });
 
       const result = await this.studyPlanService.getPlansByUserId(userId);
 
@@ -36,20 +38,26 @@ export class StudyPlanController {
         plans: result,
       });
     } catch (error: unknown) {
-      return res.status(500).json({ message: getErrorMessage(error) });
+      console.error("Failed to retrieve study plans:", error);
+      return res.status(500).json({
+        message: "We couldn't load your study plans. Please try again.",
+      });
     }
   };
 
   deletePlan = async (req: Request, res: Response) => {
     const userId = this.getUserId(req);
-    if (!userId) return res.status(401).json({ message: "Unauthorized." });
+    if (!userId) return res.status(401).json({ message: "Please sign in to continue." });
     try {
         const planId = Number(req.params.id);
         await this.studyPlanService.deletePlan(planId, userId);
 
         return res.status(204).send();
     } catch (error: unknown) {
-      return res.status(500).json({ message: getErrorMessage(error) });
+      console.error("Failed to delete study plan:", error);
+      return res.status(500).json({
+        message: "We couldn't remove the study plan. Please try again.",
+      });
     }
   };
 

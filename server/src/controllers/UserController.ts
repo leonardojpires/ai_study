@@ -1,6 +1,5 @@
 import { UserService } from "../services/userService.js";
 import { Request, Response } from 'express';
-import { getErrorMessage } from "../utils/errors.js";
 
 type AuthenticatedRequest = Request & { user?: { sub?: number } };
 
@@ -18,7 +17,10 @@ export class UserController {
                 users
             });
         } catch(err: unknown) {
-            return res.status(500).json({ message: getErrorMessage(err) });
+            console.error("Failed to retrieve users:", err);
+            return res.status(500).json({
+                message: "We couldn't load the requested information. Please try again."
+            });
         }
     }
 
@@ -33,7 +35,10 @@ export class UserController {
                 user: result.toSafeObject()
             });
         } catch(err: unknown) {
-            return res.status(404).json({ message: getErrorMessage(err) });
+            console.error("Failed to retrieve user:", err);
+            return res.status(404).json({
+                message: "The requested user could not be found."
+            });
         }
     }
 
@@ -43,7 +48,9 @@ export class UserController {
             const userId = authenticatedReq.user?.sub;
 
             if (!userId) {
-                throw new Error('User not authenticated.');
+                return res.status(401).json({
+                    message: "Please sign in to continue."
+                });
             }
 
             const result = await this.userService.getCurrentUser(Number(userId));
@@ -53,7 +60,10 @@ export class UserController {
                 user: result.toSafeObject()
             });
         } catch(err: unknown) {
-            return res.status(404).json({ message: getErrorMessage(err) });
+            console.error("Failed to retrieve current user:", err);
+            return res.status(500).json({
+                message: "We couldn't load your profile. Please try again."
+            });
         }
     }
 }
