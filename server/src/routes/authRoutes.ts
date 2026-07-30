@@ -3,6 +3,7 @@ import { AuthService } from "../services/authService.js";
 import { AuthController } from "../controllers/authController.js";
 import { UserRepository } from "../repositories/userRepository.js";
 import authenticateToken from "../middlewares/authMiddleware.js";
+import { loginLimiter, registerLimiter } from '../config/authLimiter.js';
 
 const authRouter = Router();
 
@@ -10,8 +11,8 @@ const userRepository = new UserRepository();
 const authService = new AuthService(userRepository);
 const authController = new AuthController(authService);
 
-authRouter.post("/register", authController.register);
-authRouter.post("/login", authController.login);
+authRouter.post("/register", loginLimiter, authController.register);
+authRouter.post("/login", registerLimiter, authController.login);
 authRouter.post("/logout", authenticateToken, authController.logout);
 
 export default authRouter;
