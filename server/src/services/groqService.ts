@@ -3,6 +3,8 @@ import { CreateStudyPlanDTO } from "../dtos/StudyPlanDTO.js";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || "",
+  timeout: 20* 1000,
+  maxRetries: 1
 });
 
 interface GroqConversationResult {
