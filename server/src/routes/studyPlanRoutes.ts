@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { StudyPlanRepository } from "../repositories/studyPlanRepository.js";
-import { pool } from "../database/db.js";
 import { StudyPlanService } from "../services/studyPlanService.js";
 import { StudyPlanController } from "../controllers/StudyPlanController.js";
 import authenticateToken from "../middlewares/authMiddleware.js";
+import { pool } from "../database/db.js";
 
 const studyPlanRouter = Router();
 
