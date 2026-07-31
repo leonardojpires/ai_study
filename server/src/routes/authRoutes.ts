@@ -11,8 +11,8 @@ const userRepository = new UserRepository();
 const authService = new AuthService(userRepository);
 const authController = new AuthController(authService);
 
-authRouter.post("/register", loginLimiter, authController.register);
-authRouter.post("/login", registerLimiter, authController.login);
+authRouter.post("/register", registerLimiter, authController.register);
+authRouter.post("/login", loginLimiter, authController.login);
 authRouter.post("/logout", authenticateToken, authController.logout);
 
 export default authRouter;
