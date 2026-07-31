@@ -78,8 +78,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!result.success) {
         throw new Error("Registration failed.");
       }
-      // Registration does not auto-login; user remains unauthenticated.
-      setStatus("unauthenticated");
+      setStatus("authenticated");
     },
     [],
   );

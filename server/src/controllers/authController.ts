@@ -42,7 +42,7 @@ export class AuthController {
         } catch(error: unknown) {
             // console.error("Login failed:", error);
             return res.status(401).json({
-                message: "The email or password is incorrect."
+                message: "The e-mail or password is incorrect."
             });
         }
     }
