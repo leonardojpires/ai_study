@@ -5,7 +5,23 @@ const loginLimiter = rateLimit({
     limit: 7,
     standardHeaders: true,
     legacyHeaders: false,
-    ipv6Subnet: 56, 
+    keyGenerator: (req, res) => {
+        const { email } = req.body;
+        const normalizedEmail = email?.trim().toLowerCase();
+
+        if (normalizedEmail) return normalizedEmail;
+    },
+    message: {
+        error: "Too many requests. Please try again later."
+    }
+});
+
+const loginIpLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 7,
+    standardHeaders: true,
+    legacyHeaders: false,
+    ipv6Subnet: 56,
     message: {
         error: "Too many requests. Please try again later."
     }
@@ -22,4 +38,4 @@ const registerLimiter = rateLimit({
     }
 });
 
-export { loginLimiter, registerLimiter };
+export { loginLimiter, loginIpLimiter, registerLimiter };
