@@ -21,7 +21,7 @@ export class AuthController {
                 user: result.user.toSafeObject()
             });
         } catch(error: unknown) {
-            console.error("Account registration failed:", error);
+            // console.error("Account registration failed:", error);
             return res.status(400).json({
                 message: "We couldn't create your account. Please check your details and try again."
             });
@@ -40,7 +40,7 @@ export class AuthController {
                 user: result.user.toSafeObject()
             });
         } catch(error: unknown) {
-            console.error("Login failed:", error);
+            // console.error("Login failed:", error);
             return res.status(401).json({
                 message: "The email or password is incorrect."
             });
@@ -59,7 +59,7 @@ export class AuthController {
                 success: true 
             });
         } catch(error: unknown) {
-            console.error("Logout failed:", error);
+            // console.error("Logout failed:", error);
             return res.status(500).json({
                 message: "We couldn't log you out. Please try again."
             });

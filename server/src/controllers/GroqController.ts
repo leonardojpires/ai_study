@@ -13,6 +13,10 @@ type ChatMessage = {
   text: string;
 };
 
+const MAX_MESSAGES = 20;
+const MAX_MESSAGE_LENGTH = 2_000;
+const MAX_CONVERSATION_LENGTH = 12_000;
+
 export class GroqController {
   constructor(
     private groqService: GroqService,
@@ -74,6 +78,35 @@ export class GroqController {
         });
       }
 
+      const hasInvalidMessage = messages.some(
+        (message) =>
+          typeof message !== "object" ||
+          message === null ||
+          (message.role !== "assistant" && message.role !== "user") ||
+          typeof message.text !== "string",
+      );
+
+      if (hasInvalidMessage) {
+        return res.status(400).json({
+          message: "Please provide a valid conversation.",
+        });
+      }
+
+      const conversationLength = messages.reduce(
+        (total, message) => total + message.text.length,
+        0,
+      );
+
+      if (
+        messages.length > MAX_MESSAGES ||
+        messages.some((message) => message.text.length > MAX_MESSAGE_LENGTH) ||
+        conversationLength > MAX_CONVERSATION_LENGTH
+      ) {
+        return res.status(413).json({
+          message: "This conversation is too long. Please shorten it and try again.",
+        });
+      }
+
       const result = await this.groqService.converse(messages);
 
       if (result.status === "ready" && result.plan) {
@@ -90,7 +123,7 @@ export class GroqController {
 
       return res.status(200).json(result);
     } catch (error: unknown) {
-      console.error("Study plan conversation failed:", error);
+      // console.error("Study plan conversation failed:", error);
       return res.status(500).json({
         message: "We couldn't process your request. Please try again.",
       });
@@ -116,7 +149,7 @@ export class GroqController {
         studyPlan,
       });
     } catch (error: unknown) {
-      console.error("Failed to save study plan:", error);
+      // console.error("Failed to save study plan:", error);
       return res.status(500).json({
         message: "We couldn't save your study plan. Please try again.",
       });

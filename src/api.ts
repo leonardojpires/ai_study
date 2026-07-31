@@ -38,23 +38,33 @@ type GroqResponse = {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
+function getErrorMessage(status: number): string {
+  switch (status) {
+    case 400:
+    case 422:
+      return "Please check the information you provided and try again.";
+    case 401:
+      return "We couldn't verify your account. Please check your details or sign in again.";
+    case 403:
+      return "You don't have permission to perform this action.";
+    case 404:
+      return "The requested information could not be found.";
+    case 409:
+      return "This request conflicts with existing information. Please review it and try again.";
+    case 413:
+      return "The submitted information is too large. Please shorten it and try again.";
+    case 429:
+      return "You've made too many requests. Please wait a moment and try again.";
+    default:
+      return status >= 500
+        ? "Something went wrong on our side. Please try again later."
+        : "We couldn't complete your request. Please try again.";
+  }
+}
+
 async function parseJsonResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    let message = `Request failed with status ${response.status}`;
-
-    try {
-      const body = await response.json();
-      if (body && typeof body.message === "string") {
-        message = body.message;
-      }
-    } catch {
-      const details = await response.text();
-      if (details) {
-        message = details;
-      }
-    }
-
-    throw new Error(message);
+    throw new Error(getErrorMessage(response.status));
   }
 
   return (await response.json()) as T;
@@ -148,11 +158,8 @@ export async function deletePlan(planId: number) {
     credentials: "include",
   });
 
-  if (!response.ok) { 
-    const error = await response.json();
-    throw new Error(
-      error.message || "Failed to delete plan"
-    ) 
+  if (!response.ok) {
+    throw new Error(getErrorMessage(response.status));
   }
 
   return response;

@@ -44,7 +44,7 @@ export function ChatPage() {
         tone: "success",
       });
     } catch (err) {
-      console.error("Failed to save plan:", err);
+      // console.error("Failed to save plan:", err);
       showToast({
         title: "Could not save plan",
         message: err instanceof Error ? err.message : "Please try again.",

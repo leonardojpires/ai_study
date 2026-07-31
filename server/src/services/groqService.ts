@@ -1,8 +1,11 @@
 import Groq from "groq-sdk";
 import { CreateStudyPlanDTO } from "../dtos/StudyPlanDTO.js";
+import pLimit from "p-limit";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || "",
+  timeout: 20* 1000,
+  maxRetries: 1
 });
 
 interface GroqConversationResult {
@@ -27,6 +30,8 @@ type ChatMessage = {
 };
 
 export default class GroqService {
+  private readonly groqConcurrencyLimit = pLimit(2);
+
   private buildPrompt(messages: ChatMessage[]) {
     const instructions = [
       // Identity and tone
@@ -84,13 +89,16 @@ export default class GroqService {
   }
 
   private async callGroq(prompt: string): Promise<string> {
-    const response = await groq.chat.completions.create({
-      model: process.env.GROQ_MODEL || "",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-    });
+    return this.groqConcurrencyLimit(async () => {
+      const response = await groq.chat.completions.create({
+        model: process.env.GROQ_MODEL || "",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_completion_tokens: 3_000,
+      });
 
-    return response.choices[0]?.message?.content || "";
+      return response.choices[0]?.message?.content || "";
+    });
   }
 
   private validatePlan(candidate: CreateStudyPlanDTO): boolean {
