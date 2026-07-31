@@ -1,7 +1,7 @@
 import { Router } from "express";
+import { UserRepository } from "../repositories/userRepository.js";
 import { AuthService } from "../services/authService.js";
 import { AuthController } from "../controllers/AuthController.js";
-import { UserRepository } from "../repositories/userRepository.js";
 import authenticateToken from "../middlewares/authMiddleware.js";
 import { loginLimiter, loginIpLimiter, registerLimiter } from '../config/authLimiter.js';
 
