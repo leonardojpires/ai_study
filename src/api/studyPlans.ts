@@ -6,7 +6,6 @@ import type {
 import {
   apiUrl,
   ensureSuccessfulResponse,
-  jsonHeaders,
   parseJsonResponse,
 } from "./client.js";
 import { getCsrfHeaders } from "./auth.js";
