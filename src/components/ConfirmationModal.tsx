@@ -1,3 +1,5 @@
+import { createPortal } from "react-dom";
+
 interface ConfirmationModalProps {
   title: string;
   description: string;
@@ -19,7 +21,7 @@ export function ConfirmationModal({
   onConfirm,
   onCancel,
 }: ConfirmationModalProps) {
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center px-4"
       role="dialog"
@@ -83,6 +85,7 @@ export function ConfirmationModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
