@@ -37,7 +37,7 @@ export async function getPlansByUserId(): Promise<SavedPlansResponse> {
 export async function deletePlan(planId: number): Promise<Response> {
   const response = await fetch(apiUrl(`/study-plan/delete-plan/${planId}`), {
     method: "DELETE",
-    headers: jsonHeaders,
+    headers: getCsrfHeaders(),
     credentials: "include",
   });
 

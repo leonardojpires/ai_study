@@ -22,6 +22,7 @@ const {
         return req.user.jti;
     },
     cookieOptions: {
+        secure: true,
         sameSite: 'none'
     }
 });
