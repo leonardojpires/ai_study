@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deletePlan, getPlansByUserId } from "../api";
+import { deletePlan, fetchCsrfToken, getPlansByUserId } from "../api";
 import { useToast } from "./ToastProvider";
 import { SavedPlan } from "../types";
 
@@ -37,6 +37,8 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
   const [planToRemove, setPlanToRemove] = useState<SavedPlan | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
   const [removeError, setRemoveError] = useState<string | null>(null);
+  const [csrfToken, setCsrfToken] = useState<string | null>(null);
+  const [isTestingCsrf, setIsTestingCsrf] = useState(false);
 
   useEffect(() => {
     if (isLoading || !user) return;
@@ -129,6 +131,29 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
     }
   }
 
+  async function handleCsrfTest() {
+    setCsrfToken(null);
+    setIsTestingCsrf(true);
+
+    try {
+      const token = await fetchCsrfToken();
+      setCsrfToken(token);
+      showToast({
+        title: "CSRF request succeeded",
+        message: "The frontend retrieved a token.",
+        tone: "success",
+      });
+    } catch (err: unknown) {
+      showToast({
+        title: "CSRF request failed",
+        message: getErrorMessage(err),
+        tone: "error",
+      });
+    } finally {
+      setIsTestingCsrf(false);
+    }
+  }
+
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
       <section className="mx-auto flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
@@ -182,6 +207,31 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
           </div>
         )}
       </section>
+
+      { user?.isAdmin && (
+      <section className="mx-auto mt-6 w-full max-w-6xl rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+        <p className="eyebrow">Security diagnostic</p>
+        <h3 className="mt-2 text-2xl font-black text-[var(--text)]">
+          CSRF token retrieval
+        </h3>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Test whether this authenticated browser session can retrieve a token.
+        </p>
+        <button
+          type="button"
+          className="mt-5 mb-4 rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+          onClick={handleCsrfTest}
+          disabled={isTestingCsrf}
+        >
+          {isTestingCsrf ? "Requesting CSRF token..." : "Test CSRF token"}
+        </button>
+        {csrfToken && (
+          <p className="break-all rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 px-4 py-3 text-xs text-[var(--text-muted)]">
+            <strong>Retrieved token:</strong> {csrfToken}
+          </p>
+        )}
+      </section>
+      ) }
 
       <section className="mx-auto mt-6 flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

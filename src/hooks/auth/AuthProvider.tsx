@@ -12,6 +12,7 @@ import {
   loginUser as apiLoginUser,
   logoutUser as apiLogoutUser,
   registerUser as apiRegisterUser,
+  fetchCsrfToken,
 } from "../../api";
 
 export interface AuthUser {
@@ -49,6 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (response.success) {
         setUser(response.user);
         setStatus("authenticated");
+        await fetchCsrfToken();
       } else {
         setUser(null);
         setStatus("unauthenticated");
@@ -70,6 +72,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     setUser(result.user);
     setStatus("authenticated");
+    await fetchCsrfToken();
   }, []);
 
   const register = useCallback(
@@ -79,6 +82,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error("Registration failed.");
       }
       setStatus("authenticated");
+      await fetchCsrfToken();
     },
     [],
   );

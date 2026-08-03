@@ -49,7 +49,6 @@ export class AuthController {
 
     logout = async (req: Request, res: Response) => {
         try {
-
             await this.authService.logout(res);
             
             res.clearCookie(COOKIE_NAME);

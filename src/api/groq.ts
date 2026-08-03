@@ -1,4 +1,5 @@
-import { apiUrl, jsonHeaders, parseJsonResponse } from "./client.js";
+import { apiUrl, parseJsonResponse } from "./client.js";
+import { getCsrfHeaders } from "./auth.js";
 import type {
   ChatMessage,
   GroqResponse,
@@ -8,7 +9,7 @@ import type {
 export async function converse(messages: ChatMessage[]): Promise<GroqResponse> {
   const response = await fetch(apiUrl("/groq/converse"), {
     method: "POST",
-    headers: jsonHeaders,
+    headers: getCsrfHeaders(),
     body: JSON.stringify({ messages }),
     credentials: "include",
   });
@@ -21,7 +22,7 @@ export async function persistGroqPlan(
 ): Promise<unknown> {
   const response = await fetch(apiUrl("/groq/persist"), {
     method: "POST",
-    headers: jsonHeaders,
+    headers: getCsrfHeaders(),
     body: JSON.stringify(plan),
     credentials: "include",
   });

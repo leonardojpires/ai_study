@@ -9,13 +9,14 @@ import {
   jsonHeaders,
   parseJsonResponse,
 } from "./client.js";
+import { getCsrfHeaders } from "./auth.js";
 
 export async function createStudyPlan(
   payload: StudyPlanRequest,
 ): Promise<StudyPlanResponse> {
   const response = await fetch(apiUrl("/study-plan/generate"), {
     method: "POST",
-    headers: jsonHeaders,
+    headers: getCsrfHeaders(),
     body: JSON.stringify(payload),
     credentials: "include",
   });
@@ -26,7 +27,7 @@ export async function createStudyPlan(
 export async function getPlansByUserId(): Promise<SavedPlansResponse> {
   const response = await fetch(apiUrl("/study-plan/get-saved-plans"), {
     method: "GET",
-    headers: jsonHeaders,
+    headers: getCsrfHeaders(),
     credentials: "include",
   });
 

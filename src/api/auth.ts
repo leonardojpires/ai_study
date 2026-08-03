@@ -1,6 +1,8 @@
 import { apiUrl, jsonHeaders, parseJsonResponse } from "./client.js";
 import type { AuthResponse } from "./types.js";
 
+let csrfToken: string;
+
 export async function loginUser(
   email: string,
   password: string,
@@ -13,6 +15,10 @@ export async function loginUser(
   });
 
   return parseJsonResponse<AuthResponse>(response);
+}
+
+type CsrfTokenResponse = {
+  csrfToken: string
 }
 
 export async function registerUser(
@@ -41,6 +47,28 @@ export async function fetchCurrentUser(): Promise<AuthResponse> {
 export async function logoutUser(): Promise<void> {
   await fetch(apiUrl("/auth/logout"), {
     method: "POST",
+    headers: getCsrfHeaders(),
     credentials: "include",
   });
+}
+
+export async function fetchCsrfToken(): Promise<string> {
+  const response = await fetch(apiUrl('/auth/get-csrf-token'), {
+    method: 'GET',
+    credentials: 'include'
+  });
+
+  const body = await parseJsonResponse<CsrfTokenResponse>(response);
+
+  csrfToken = body.csrfToken;
+  return csrfToken;
+}
+
+export function getCsrfHeaders() {
+  if (!csrfToken) throw new Error("CSRF token is not available");
+
+  return {
+    ...jsonHeaders,
+    'X-CSRF-Token': csrfToken
+  };
 }

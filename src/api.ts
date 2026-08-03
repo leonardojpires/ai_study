@@ -1,6 +1,7 @@
 // Public API facade. Keeping this module stable avoids coupling consumers to the
 // internal organization of the API layer.
 export {
+  fetchCsrfToken,
   fetchCurrentUser,
   loginUser,
   logoutUser,

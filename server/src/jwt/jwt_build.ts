@@ -1,14 +1,15 @@
 import jwt from "jsonwebtoken";
 import { CookieOptions } from "express";
+import { randomUUID } from "node:crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "";
-const COOKIE_NAME = process.env.COOKIE_NAME || "";
+// const COOKIE_NAME = process.env.COOKIE_NAME || "";
 
 function buildToken(userId: number) {
     return jwt.sign(
         { sub: userId },
         JWT_SECRET,
-        { expiresIn: "7d" }
+        { expiresIn: "7d", jwtid: randomUUID() }
     );
 }
 

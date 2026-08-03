@@ -4,6 +4,7 @@ declare global {
     namespace Express {
         interface UserPayload {
             sub: number;
+            jti: string;
         }
 
         interface Request {
