@@ -12,10 +12,14 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET ?? "");
-        if (typeof decoded === "string" || typeof decoded.sub !== "number") {
+        if (
+            typeof decoded === "string" ||
+            typeof decoded.sub !== "number" ||
+            typeof decoded.jti !== "string"
+        ) {
             return res.status(403).json({ message: "Forbidden. Invalid token payload." });
         }
-        req.user = { sub: decoded.sub };
+        req.user = { sub: decoded.sub, jti: decoded.jti };
         
         next();
     } catch(err) {
