@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { deletePlan, fetchCsrfToken, getPlansByUserId } from "../api";
 import { useToast } from "./ToastProvider";
 import { SavedPlan } from "../types";
@@ -22,13 +23,15 @@ function getErrorMessage(error: unknown): string {
 
 export function UserProfile({ user, isLoading, error }: UserProfileProps) {
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const initials =
     user?.name
       .split(" ")
       .filter(Boolean)
       .slice(0, 2)
       .map((part) => part[0]?.toUpperCase())
-      .join("") || "U";
+      .join("") 
+      || "U";
 
   const [plans, setPlans] = useState<SavedPlan[]>([]);
   const [plansLoading, setPlansLoading] = useState(false);
@@ -319,6 +322,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
                       <div className="mt-auto flex flex-wrap gap-2 pt-4">
                         <button
                           type="button"
+                          onClick={() => navigate(`/plans/${plan.id}`)}
                           className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[var(--accent-strong)]"
                         >
                           View details

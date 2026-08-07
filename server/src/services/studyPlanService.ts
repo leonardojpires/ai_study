@@ -23,6 +23,15 @@ export class StudyPlanService {
         return studyPlans;
     }
 
+    async getPlanById(userId: number, planId: number) {
+        if (!userId) throw new Error("User not found");
+        if (!planId) throw new Error("Plan not found.");
+        
+        const studyPlan = await this.studyPlanRepository.getPlanById(userId, planId);
+
+        return studyPlan;
+    }
+
     async deletePlan(planId: number, userId: number) {
         const affectedRows = await this.studyPlanRepository.deletePlan(planId, userId);
 
