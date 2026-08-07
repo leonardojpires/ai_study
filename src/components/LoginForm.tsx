@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { PasswordVisibilityIcon } from "./PasswordVisibilityIcon";
 
 interface LoginFormProps {
   onLogin: (email: string, password: string, rememberMe: boolean) => void;
@@ -36,22 +37,24 @@ export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
 
       <label>
         Password
-        <input
-          type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Your password"
-          required
-        />
-      </label>
-
-      <label className="checkbox-label">
-        <input
-          type="checkbox"
-          checked={showPassword}
-          onChange={(e) => setShowPassword(e.target.checked)}
-        />
-        Show password
+        <span className="password-input-wrap">
+          <input
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Your password"
+            required
+          />
+          <button
+            className="password-visibility-button"
+            type="button"
+            onClick={() => setShowPassword((visible) => !visible)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+          >
+            <PasswordVisibilityIcon visible={showPassword} />
+          </button>
+        </span>
       </label>
 
       <label className="checkbox-label">

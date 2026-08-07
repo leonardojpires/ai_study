@@ -15,6 +15,14 @@ export function AppRouter() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route
+        path="/guide"
+        element={
+          <AppShell>
+            <GuidePage />
+          </AppShell>
+        }
+      />
 
       <Route
         path="/chat"
@@ -22,16 +30,6 @@ export function AppRouter() {
           <ProtectedRoute>
             <AppShell>
               <ChatPage />
-            </AppShell>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/guide"
-        element={
-          <ProtectedRoute>
-            <AppShell>
-              <GuidePage />
             </AppShell>
           </ProtectedRoute>
         }

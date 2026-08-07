@@ -167,9 +167,6 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
             <h2 className="mt-2 break-words text-3xl font-black text-[var(--text)]">
               {user?.name || "User account"}
             </h2>
-            <p className="mt-1 break-words text-base text-[var(--text-muted)]">
-              {user?.email || "Account information"}
-            </p>
           </div>
         </div>
 
