@@ -24,7 +24,7 @@ export class AuthService {
         if (!createdUser) throw new Error('User not created.');
         if (!createdUser.id) throw new Error('User not created.');
 
-        const token = buildToken(createdUser.id);
+        const token = buildToken(createdUser.id, false);
 
         return {
             success: true,
@@ -33,7 +33,7 @@ export class AuthService {
         }
     }
 
-    async login(email: string, password: string) {
+    async login(email: string, password: string, rememberMe: boolean) {
         if (!email || !password) throw new Error("Invalid input.");
         if (!email.includes("@")) throw new Error("Invalid email.");
 
@@ -44,7 +44,7 @@ export class AuthService {
         const isPasswordValid = await user.checkPassword(password);
         if (!isPasswordValid) throw new Error("Invalid password.");
 
-        const token = buildToken(user.id);
+        const token = buildToken(user.id, rememberMe);
 
         if (!isPasswordValid) throw new Error("Invalid password.");
 

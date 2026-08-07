@@ -25,11 +25,11 @@ export function LoginPage() {
     }
   }, [status, navigate, location.state]);
 
-  async function handleLogin(email: string, password: string) {
+  async function handleLogin(email: string, password: string, rememberMe: boolean) {
     setError(null);
     setIsLoading(true);
     try {
-      await login(email, password);
+      await login(email, password, rememberMe);
       const from = (location.state as LocationState | null)?.from ?? "/chat";
       showToast({
         title: "Welcome back",

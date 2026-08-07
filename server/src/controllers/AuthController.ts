@@ -30,8 +30,8 @@ export class AuthController {
 
     login = async (req: Request, res: Response) => {
         try {
-            const { email, password } = req.body;
-            const result = await this.authService.login(email, password);
+            const { email, password, rememberMe } = req.body;
+            const result = await this.authService.login(email, password, rememberMe);
 
             res.cookie(COOKIE_NAME, result.token, cookieOptions);
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => void;
+  onLogin: (email: string, password: string, rememberMe: boolean) => void;
   isLoading?: boolean;
   error?: string | null;
 }
@@ -9,11 +9,12 @@ interface LoginFormProps {
 export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onLogin(email.trim(), password);
+    onLogin(email.trim(), password, rememberMe);
   }
 
   return (
@@ -51,6 +52,15 @@ export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
           onChange={(e) => setShowPassword(e.target.checked)}
         />
         Show password
+      </label>
+
+      <label className="checkbox-label">
+        <input
+          type="checkbox"
+          checked={rememberMe}
+          onChange={(e) => setRememberMe(e.target.checked)}
+        />
+        Remember me
       </label>
 
       <button type="submit" disabled={isLoading}>
