@@ -1,4 +1,5 @@
 import type {
+  SavedPlanResponse,
   SavedPlansResponse,
   StudyPlanRequest,
   StudyPlanResponse,
@@ -32,6 +33,17 @@ export async function getPlansByUserId(): Promise<SavedPlansResponse> {
 
   return parseJsonResponse<SavedPlansResponse>(response);
 }
+
+export async function getPlanById(id: number): Promise<SavedPlanResponse> {
+  const response = await fetch(apiUrl(`/study-plan/plan/${id}`), {
+    method: "GET",
+    headers: getCsrfHeaders(),
+    credentials: "include"
+  });
+
+  return parseJsonResponse<SavedPlanResponse>(response);
+}
+
 
 export async function deletePlan(planId: number): Promise<Response> {
   const response = await fetch(apiUrl(`/study-plan/delete-plan/${planId}`), {

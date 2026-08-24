@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { PasswordVisibilityIcon } from "./PasswordVisibilityIcon";
 
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => void;
+  onLogin: (email: string, password: string, rememberMe: boolean) => void;
   isLoading?: boolean;
   error?: string | null;
 }
@@ -9,11 +10,12 @@ interface LoginFormProps {
 export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onLogin(email.trim(), password);
+    onLogin(email.trim(), password, rememberMe);
   }
 
   return (
@@ -35,22 +37,33 @@ export function LoginForm({ onLogin, isLoading, error }: LoginFormProps) {
 
       <label>
         Password
-        <input
-          type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Your password"
-          required
-        />
+        <span className="password-input-wrap">
+          <input
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Your password"
+            required
+          />
+          <button
+            className="password-visibility-button"
+            type="button"
+            onClick={() => setShowPassword((visible) => !visible)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+          >
+            <PasswordVisibilityIcon visible={showPassword} />
+          </button>
+        </span>
       </label>
 
       <label className="checkbox-label">
         <input
           type="checkbox"
-          checked={showPassword}
-          onChange={(e) => setShowPassword(e.target.checked)}
+          checked={rememberMe}
+          onChange={(e) => setRememberMe(e.target.checked)}
         />
-        Show password
+        Remember me
       </label>
 
       <button type="submit" disabled={isLoading}>

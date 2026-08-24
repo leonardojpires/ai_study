@@ -26,7 +26,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   status: "loading" | "authenticated" | "unauthenticated";
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -65,8 +65,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     void refresh();
   }, [refresh]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const result = await apiLoginUser(email, password);
+  const login = useCallback(async (email: string, password: string, rememberMe: boolean) => {
+    const result = await apiLoginUser(email, password, rememberMe);
     if (!result.success) {
       throw new Error("Login failed.");
     }

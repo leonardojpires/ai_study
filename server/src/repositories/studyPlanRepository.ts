@@ -135,6 +135,26 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     }
   }
 
+  async getPlanById(userId: number, planId: number) {
+    const conn = await this.pool.getConnection();
+    try {
+      const plan = await this.getStudyPlan(conn, userId, planId);
+
+      if (!plan) throw new Error("Study plan not found.");
+
+      if (plan[0]?.user_id !== userId) throw new Error("You don't have permission to see this study plan.");
+
+      const weeks = await this.getWeeks(conn, plan);
+      const objectives = await this.getWeeksObjectives(conn, weeks);
+      const topics = await this.getWeeksTopics(conn, weeks);
+
+      return this.buildStudyPlans(plan, weeks, objectives, topics);
+
+    } finally {
+      conn.release();
+    }
+  }
+
   async deletePlan(planId: number, userId: number): Promise<number> {
     const conn = await this.pool.getConnection();
 
@@ -169,8 +189,21 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     return result;
   }
 
+  private async getStudyPlan(conn: PoolConnection, userId: number, planId: number) {
+    const [result] = await conn.execute<StudyPlanRow[]>(
+      `SELECT *
+      FROM study_plans
+      WHERE id = ?
+      AND user_id = ?`,
+      [planId, userId]
+    );
+
+    return result;
+  }
+
   private async getWeeks(conn: PoolConnection, plans: StudyPlanRow[]): Promise<StudyPlanWeekRow[]> {
     const planIds = plans.map((plan) => plan.id);
+    if (!planIds) return [];
 
     const [result] = await conn.query<StudyPlanWeekRow[]>(
       `SELECT *

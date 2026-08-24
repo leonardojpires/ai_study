@@ -6,11 +6,12 @@ let csrfToken: string;
 export async function loginUser(
   email: string,
   password: string,
+  rememberMe: boolean
 ): Promise<AuthResponse> {
   const response = await fetch(apiUrl("/auth/login"), {
     method: "POST",
     headers: jsonHeaders,
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, rememberMe }),
     credentials: "include",
   });
 

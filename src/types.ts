@@ -47,3 +47,8 @@ export interface SavedPlansResponse {
   success: boolean;
   plans: SavedPlan[];
 }
+
+export interface SavedPlanResponse {
+  success: boolean;
+  plan: SavedPlan;
+}

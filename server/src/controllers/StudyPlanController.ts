@@ -45,6 +45,30 @@ export class StudyPlanController {
     }
   };
 
+  getPlanById = async (req: Request, res: Response) => {
+    try {
+      const userId = this.getUserId(req);
+      if (!userId) return res.status(401).json({ message: "Please sign in to continue." });
+
+      const { id } = req.params;
+      const planId = Number(id);
+
+      if (!planId) return res.status(404).json({ message: "Study plan not found." });
+
+      const result = await this.studyPlanService.getPlanById(userId, planId);
+
+      return res.status(201).json({
+        success: true,
+        plan: result
+      });
+    } catch(error: unknown) {
+      console.log(error);
+      return res.status(500).json({
+        message: "We couldn't load this study plan. Please try again.",
+      });
+    }
+  }
+
   deletePlan = async (req: Request, res: Response) => {
     const userId = this.getUserId(req);
     if (!userId) return res.status(401).json({ message: "Please sign in to continue." });

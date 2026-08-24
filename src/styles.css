@@ -47,6 +47,10 @@ textarea {
   color: #000;
 }
 
+input {
+  font-weight: 400;
+}
+
 input::placeholder,
 textarea::placeholder {
   color: rgba(0, 0, 0, 0.45);
@@ -481,6 +485,51 @@ p {
   border-color: var(--accent);
   background: #fff;
   box-shadow: 0 0 0 4px rgba(43, 111, 74, 0.12);
+}
+
+.password-input-wrap {
+  position: relative;
+  display: block;
+}
+
+.auth-form .password-input-wrap input {
+  padding-right: 3rem;
+}
+
+.password-visibility-button {
+  position: absolute;
+  top: 50%;
+  right: 0.7rem;
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--text-muted);
+  transform: translateY(-50%);
+}
+
+.password-visibility-button:hover {
+  background: rgba(43, 71, 111, 0.08);
+  color: var(--accent);
+}
+
+.password-visibility-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.password-visibility-button svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 .auth-form .checkbox-label {

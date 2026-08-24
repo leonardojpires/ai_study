@@ -6,6 +6,7 @@ import { GuidePage } from "./pages/GuidePage";
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { PlanDetailsPage } from "./pages/PlanDetailsPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { RegisterPage } from "./pages/RegisterPage";
 
@@ -15,6 +16,14 @@ export function AppRouter() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route
+        path="/guide"
+        element={
+          <AppShell>
+            <GuidePage />
+          </AppShell>
+        }
+      />
 
       <Route
         path="/chat"
@@ -27,21 +36,21 @@ export function AppRouter() {
         }
       />
       <Route
-        path="/guide"
-        element={
-          <ProtectedRoute>
-            <AppShell>
-              <GuidePage />
-            </AppShell>
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/profile"
         element={
           <ProtectedRoute>
             <AppShell>
               <ProfilePage />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/plans/:planId"
+        element={
+          <ProtectedRoute>
+            <AppShell>
+              <PlanDetailsPage />
             </AppShell>
           </ProtectedRoute>
         }
