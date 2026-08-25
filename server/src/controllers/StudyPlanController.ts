@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { StudyPlanService } from "../services/studyPlanService.js";
+import PlanNotFoundError from "../utils/PlanNotFoundError.js";
 
 type AuthenticatedRequest = Request & { user?: { sub?: number } };
 
@@ -56,13 +57,18 @@ export class StudyPlanController {
       if (!planId) return res.status(404).json({ message: "Study plan not found." });
 
       const result = await this.studyPlanService.getPlanById(userId, planId);
-
-      return res.status(201).json({
+      
+      return res.status(200).json({
         success: true,
         plan: result
       });
     } catch(error: unknown) {
-      console.log(error);
+      if (error instanceof PlanNotFoundError) {
+        return res.status(404).json({
+          message: "Plan not found."
+        });
+        console.log(  )
+      }
       return res.status(500).json({
         message: "We couldn't load this study plan. Please try again.",
       });

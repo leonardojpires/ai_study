@@ -7,6 +7,7 @@ import type {
 import { IStudyPlanRepository } from "./IStudyPlanRepository.js";
 import { StudyPlan } from "../domains/StudyPlan.js";
 import { StudyPlanWeek } from "../domains/StudyPlanWeek.js"; 
+import PlanNotFoundError from "../utils/PlanNotFoundError.js";
 
 interface StudyPlanRow extends RowDataPacket {
   id: number;
@@ -137,18 +138,20 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
   async getPlanById(userId: number, planId: number) {
     const conn = await this.pool.getConnection();
+    
     try {
-      const plan = await this.getStudyPlan(conn, userId, planId);
+      const planAsArray = await this.getStudyPlan(conn, userId, planId);
 
-      if (!plan) throw new Error("Study plan not found.");
+      if (!planAsArray || planAsArray.length === 0) throw new PlanNotFoundError("Study plan not found.");
 
-      if (plan[0]?.user_id !== userId) throw new Error("You don't have permission to see this study plan.");
+      if (planAsArray[0]?.user_id !== userId) throw new Error("You don't have permission to see this study plan.");
 
-      const weeks = await this.getWeeks(conn, plan);
+      const weeks = await this.getWeeks(conn, planAsArray);
       const objectives = await this.getWeeksObjectives(conn, weeks);
       const topics = await this.getWeeksTopics(conn, weeks);
 
-      return this.buildStudyPlans(plan, weeks, objectives, topics);
+      const plans = this.buildStudyPlans(planAsArray, weeks, objectives, topics);
+      return plans[0];
 
     } finally {
       conn.release();
@@ -208,7 +211,8 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     const [result] = await conn.query<StudyPlanWeekRow[]>(
       `SELECT *
          FROM study_plans_weeks
-         WHERE study_plan_id IN (?)`,
+         WHERE study_plan_id IN (?)
+         ORDER BY week_number`,
       [planIds],
     );
 
