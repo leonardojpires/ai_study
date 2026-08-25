@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { ShowUserDTO } from '../dtos/ShowUserDTO.js';
 
 export class User {
-    public id: number;
+    public id?: number | undefined;
     public name: string;
     public email: string;
     private passwordHash: string;
@@ -11,7 +11,7 @@ export class User {
     public updatedAt: Date;
 
     constructor(
-        id: number,
+        id: number | undefined,
         name: string,
         email: string,
         passwordHash: string,
@@ -19,7 +19,7 @@ export class User {
         createdAt: Date,
         updatedAt: Date
     ) {
-        this.id = id;
+        this.id = id || undefined;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
