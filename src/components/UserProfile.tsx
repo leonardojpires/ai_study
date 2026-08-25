@@ -208,7 +208,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
         )}
       </section>
 
-      { user?.isAdmin && (
+      { Boolean(user?.isAdmin) && (
       <section className="mx-auto mt-6 w-full max-w-6xl rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
         <p className="eyebrow">Security diagnostic</p>
         <h3 className="mt-2 text-2xl font-black text-[var(--text)]">
@@ -231,7 +231,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
           </p>
         )}
       </section>
-      ) }
+      )}
 
       <section className="mx-auto mt-6 flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
