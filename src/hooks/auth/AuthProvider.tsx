@@ -48,9 +48,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await fetchCurrentUser();
       if (response.success) {
+        const token = await fetchCsrfToken();
+        if (!token) throw new Error("CSRF token was not returned");
+        
         setUser(response.user);
         setStatus("authenticated");
-        await fetchCsrfToken();
       } else {
         setUser(null);
         setStatus("unauthenticated");

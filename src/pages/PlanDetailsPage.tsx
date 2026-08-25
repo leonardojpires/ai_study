@@ -2,15 +2,6 @@ import { Link, useParams } from "react-router-dom";
 import type { SavedPlan } from "../types";
 import { getPlanById } from "../api/studyPlans";
 import { useEffect, useState } from "react";
-import { useAuth } from "../hooks/auth/AuthProvider";
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return String(error);
-}
 
 // Replace this value with the plan returned by GET /study-plan/get-plan/:id.
 const DUMMY_PLAN: SavedPlan = {
@@ -52,18 +43,23 @@ const DUMMY_PLAN: SavedPlan = {
 };
 
 export function PlanDetailsPage() {
-  const { user } = useAuth();
   const [plann, setPlann] = useState<SavedPlan>(DUMMY_PLAN);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isNotFound, setIsNotFound] = useState(false);
 
   const { planId } = useParams();
 
   useEffect(() => {
     async function loadPlan() {
       setIsLoading(true);
-      setError(null);
+      setIsNotFound(false);
       const id: number = Number(planId);
+
+      if (!Number.isInteger(id) || id <= 0) {
+        setIsNotFound(true);
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const response = await getPlanById(id);
@@ -73,23 +69,23 @@ export function PlanDetailsPage() {
             : response.plan;
 
           if (!fetchedPlan) {
-            setError("Could not load this study plan.");
+            setIsNotFound(true);
             return;
           }
 
           setPlann(fetchedPlan);
         } else {
-          setError("Could not load this study plan.");
+          setIsNotFound(true);
         }
-      } catch (error: unknown) {
-        setError(getErrorMessage(error));
+      } catch {
+        setIsNotFound(true);
       } finally {
         setIsLoading(false);
       }
     }
 
     void loadPlan();
-  }, [user]);
+  }, [planId]);
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
@@ -113,13 +109,39 @@ export function PlanDetailsPage() {
           </section>
         )}
 
-        {error && !isLoading && (
-          <p className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </p>
+        {isNotFound && !isLoading && (
+          <section className="mt-5 overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white/75 p-6 text-center shadow-xl backdrop-blur-xl sm:p-10">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--surface-soft)] text-[var(--accent)]">
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                className="h-8 w-8 fill-none stroke-current stroke-[1.7]"
+              >
+                <path
+                  d="M9.5 9.5a3.5 3.5 0 0 1 5 0M9 15h6M4 5.5v13A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 18.5 4h-13A1.5 1.5 0 0 0 4 5.5Z"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <p className="eyebrow mt-5">Error 404</p>
+            <h1 className="mt-2 text-2xl font-black text-[var(--text)] sm:text-3xl">
+              Study plan not found
+            </h1>
+            <p className="!mx-auto !mt-3 max-w-md text-sm leading-6 text-[var(--text-muted)]">
+              This plan may have been removed, or the link may be incorrect.
+              Return to your saved plans and choose another one.
+            </p>
+            <Link
+              to="/profile"
+              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[var(--accent-strong)]"
+            >
+              View saved plans
+            </Link>
+          </section>
         )}
 
-        {!isLoading && !error && (
+        {!isLoading && !isNotFound && (
           <>
             <section className="mt-5 rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
               <p className="eyebrow">Study plan</p>
