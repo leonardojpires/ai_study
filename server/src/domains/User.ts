@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
+import { ShowUserDTO } from '../dtos/ShowUserDTO.js';
 
 export class User {
-    public id?: number | undefined;
+    public id: number;
     public name: string;
     public email: string;
     private passwordHash: string;
@@ -10,7 +11,7 @@ export class User {
     public updatedAt: Date;
 
     constructor(
-        id: number | undefined,
+        id: number,
         name: string,
         email: string,
         passwordHash: string,
@@ -18,7 +19,7 @@ export class User {
         createdAt: Date,
         updatedAt: Date
     ) {
-        this.id = id ?? undefined;
+        this.id = id;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -43,8 +44,8 @@ export class User {
         return this.passwordHash;
     }
 
-    public toSafeObject() {
-        const { id, name, email, isAdmin, createdAt, updatedAt } = this;
-        return { id, name, email, isAdmin, createdAt, updatedAt };
+    public toSafeObject(): ShowUserDTO {
+        const { id, name, email, isAdmin } = this;
+        return { id, name, email, isAdmin };
     }
 }
