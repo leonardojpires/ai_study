@@ -25,7 +25,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [is_admin, setis_admin] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   
   const filtered = useMemo(() => {
@@ -45,7 +45,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
       name: newName.trim(),
       email: newEmail.trim(),
       password: newPassword,
-      is_admin: isAdmin,
+      is_admin: is_admin,
       active: true
     });
     showToast({
@@ -56,7 +56,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
     setNewName("");
     setNewEmail("");
     setNewPassword("");
-    setIsAdmin(false);
+    setis_admin(false);
   }
 
   function handleConfirmDelete() {
@@ -143,7 +143,7 @@ export default function UsersDashboard({ users, onAddUser, onUpdateUser, onDelet
           <input className="rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2" placeholder="Email" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} />
           <input className="rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2" placeholder="Password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
           <label className="flex items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-white/80 px-3 py-2 text-sm text-[var(--text-muted)]">
-            <input type="checkbox" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
+            <input type="checkbox" checked={is_admin} onChange={(e) => setis_admin(e.target.checked)} />
             Is Admin
           </label>
         </div>

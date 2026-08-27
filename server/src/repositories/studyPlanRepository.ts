@@ -274,7 +274,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
         user_id: plan.user_id,
         title: plan.title,
         description: plan.description,
-        createdAt: plan.created_at,
+        created_at: plan.created_at,
         weeks: weeksByPlanId.get(plan.id) ?? [],
       });
     });

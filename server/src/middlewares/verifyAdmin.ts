@@ -17,7 +17,7 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
         message: "User not found.",
       });
 
-    if (!user.isAdmin)
+    if (!user.is_admin)
       return res.status(403).json({
         message: "Forbidden.",
       });

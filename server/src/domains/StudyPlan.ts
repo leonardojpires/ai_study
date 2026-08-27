@@ -8,8 +8,8 @@ type StudyPlanProps = {
     is_saved?: boolean | undefined;
     weeks?: StudyPlanWeek[];
     user_id?: number | undefined;
-    createdAt?: Date | undefined;
-    updatedAt?: Date | undefined;
+    created_at?: Date | undefined;
+    updated_at?: Date | undefined;
 }
 
 export class StudyPlan {
@@ -19,8 +19,8 @@ export class StudyPlan {
     is_saved?: boolean | undefined;
     weeks: StudyPlanWeek[] = [];
     user_id?: number | undefined;
-    createdAt?: Date | undefined;
-    updatedAt?: Date | undefined;
+    created_at?: Date | undefined;
+    updated_at?: Date | undefined;
 
     constructor(props: StudyPlanProps) {
         this.id = props.id;
@@ -29,8 +29,8 @@ export class StudyPlan {
         this.is_saved = props.is_saved;
         this.weeks = props.weeks ?? [];
         this.user_id = props.user_id;
-        this.createdAt = props.createdAt;
-        this.updatedAt = props.updatedAt;
+        this.created_at = props.created_at;
+        this.updated_at = props.updated_at;
     }
 
     static generate(dto: CreateStudyPlanDTO, userId: number): StudyPlan { 

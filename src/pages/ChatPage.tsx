@@ -83,7 +83,7 @@ export function ChatPage() {
                 Workspace
               </p>
               <h1 className="mt-1 text-2xl font-black text-[var(--text)]">
-                AI Study Plan Chat
+                Blueprint Chatroom
               </h1>
             </div>
             <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-white/65 px-3 py-2 text-xs font-semibold text-[var(--text-muted)]">
