@@ -9,11 +9,9 @@ export {
 } from "./api/auth.js";
 export { converse, persistGroqPlan } from "./api/groq.js";
 export {
-  createStudyPlan,
   deletePlan,
   getPlansByUserId,
 } from "./api/studyPlans.js";
-export { fetchTopics } from "./api/topics.js";
 
 export type {
   AuthResponse,

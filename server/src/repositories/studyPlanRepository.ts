@@ -227,7 +227,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
     if (weekIds.length === 0) return [];
 
-    const [result] = await conn.query<StudyPlanWeekObjectiveRow[]>(
+    const [result, _] = await conn.query<StudyPlanWeekObjectiveRow[]>(
       `SELECT *
        FROM study_plans_week_objectives
        WHERE study_plan_week_id IN (?)`,
@@ -242,7 +242,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
     if (weekIds.length === 0) return [];
 
-    const [result] = await conn.query<StudyPlanWeekTopicRow[]>(
+    const [result, _] = await conn.query<StudyPlanWeekTopicRow[]>(
       `SELECT *
        FROM study_plans_week_topics
        WHERE study_plan_week_id IN (?)`,
