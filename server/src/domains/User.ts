@@ -6,30 +6,30 @@ export class User {
     public name: string;
     public email: string;
     private passwordHash: string;
-    public isAdmin: boolean;
-    public createdAt: Date;
-    public updatedAt: Date;
+    public is_admin: boolean;
+    public created_at: Date;
+    public updated_at: Date;
 
     constructor(
         id: number | undefined,
         name: string,
         email: string,
         passwordHash: string,
-        isAdmin: boolean,
-        createdAt: Date,
-        updatedAt: Date
+        is_admin: boolean,
+        created_at: Date,
+        updated_at: Date
     ) {
         this.id = id || undefined;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.isAdmin = isAdmin;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.is_admin = is_admin;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
     }
 
-    public isAdminUser(): boolean {
-        return this.isAdmin;
+    public is_adminUser(): boolean {
+        return this.is_admin;
     }
 
     public async checkPassword(password: string): Promise<boolean> {
@@ -45,7 +45,7 @@ export class User {
     }
 
     public toSafeObject(): ShowUserDTO {
-        const { id, name, email, isAdmin } = this;
-        return { id, name, email, isAdmin };
+        const { id, name, email, is_admin } = this;
+        return { id, name, email, is_admin };
     }
 }

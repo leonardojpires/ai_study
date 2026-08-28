@@ -34,13 +34,6 @@ interface StudyPlanWeekTopicRow extends RowDataPacket {
   topic: string;
 }
 
-export class StudyPlanRepository implements IStudyPlanRepository {
-  constructor(private pool: Pool) {}
-
-  async create(studyPlan: StudyPlan): Promise<StudyPlan> {
-    const conn = await this.pool.getConnection();
-    if (!studyPlan.user_id) throw new Error("User not found");
-
     // NOTE ON mysql2 `pool.query()` RETURN VALUE:
     //
     // `pool.query()` always resolves to a tuple: [result, fields].
@@ -63,6 +56,13 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     // - Do NOT treat `result` as an array (e.g., `result[0]` is incorrect).
     // - Always provide a generic type to `query()` (e.g., <ResultSetHeader>)
     //   to avoid using `any` and to let TypeScript catch incorrect assumptions.
+
+export class StudyPlanRepository implements IStudyPlanRepository {
+  constructor(private pool: Pool) {}
+
+  async create(studyPlan: StudyPlan): Promise<StudyPlan> {
+    const conn = await this.pool.getConnection();
+    if (!studyPlan.user_id) throw new Error("User not found");
 
     try {
       await conn.beginTransaction();
@@ -227,7 +227,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
     if (weekIds.length === 0) return [];
 
-    const [result] = await conn.query<StudyPlanWeekObjectiveRow[]>(
+    const [result, _] = await conn.query<StudyPlanWeekObjectiveRow[]>(
       `SELECT *
        FROM study_plans_week_objectives
        WHERE study_plan_week_id IN (?)`,
@@ -242,7 +242,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
 
     if (weekIds.length === 0) return [];
 
-    const [result] = await conn.query<StudyPlanWeekTopicRow[]>(
+    const [result, _] = await conn.query<StudyPlanWeekTopicRow[]>(
       `SELECT *
        FROM study_plans_week_topics
        WHERE study_plan_week_id IN (?)`,
@@ -274,7 +274,7 @@ export class StudyPlanRepository implements IStudyPlanRepository {
         user_id: plan.user_id,
         title: plan.title,
         description: plan.description,
-        createdAt: plan.created_at,
+        created_at: plan.created_at,
         weeks: weeksByPlanId.get(plan.id) ?? [],
       });
     });

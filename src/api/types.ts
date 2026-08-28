@@ -4,7 +4,7 @@ export interface AuthResponse {
     id: number;
     name: string;
     email: string;
-    isAdmin: boolean;
+    is_admin: boolean;
   };
 }
 

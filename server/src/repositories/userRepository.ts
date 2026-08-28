@@ -60,9 +60,9 @@ export class UserRepository implements IUserRepository {
 
     async save(user: User): Promise<void> {
         if (user.id) {
-            await pool.execute('UPDATE users SET name = ?, email = ?, password_hash = ?, is_admin = ? WHERE id = ?', [user.name, user.email, user.getPassword, user.isAdmin, user.id]);
+            await pool.execute('UPDATE users SET name = ?, email = ?, password_hash = ?, is_admin = ? WHERE id = ?', [user.name, user.email, user.getPassword, user.is_admin, user.id]);
         } else {
-            await pool.execute('INSERT INTO users (name, email, password_hash, is_admin) VALUES (?, ?, ?, ?)', [user.name, user.email, user.getPassword, user.isAdmin]);
+            await pool.execute('INSERT INTO users (name, email, password_hash, is_admin) VALUES (?, ?, ?, ?)', [user.name, user.email, user.getPassword, user.is_admin]);
         }
     }
 

@@ -8,7 +8,7 @@ type UserProfileData = {
   id: number;
   name: string;
   email: string;
-  isAdmin: boolean;
+  is_admin: boolean;
 };
 
 interface UserProfileProps {
@@ -190,7 +190,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
             {[
               ["Name", user.name],
               ["Email", user.email],
-              ["Role", user.isAdmin ? "Admin" : "Student"],
+              ["Role", user.is_admin ? "Admin" : "Student"],
             ].map(([label, value]) => (
               <div
                 key={label}
@@ -208,7 +208,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
         )}
       </section>
 
-      { Boolean(user?.isAdmin) && (
+      { Boolean(user?.is_admin) && (
       <section className="mx-auto mt-6 w-full max-w-6xl rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
         <p className="eyebrow">Security diagnostic</p>
         <h3 className="mt-2 text-2xl font-black text-[var(--text)]">

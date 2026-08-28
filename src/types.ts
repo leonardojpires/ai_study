@@ -39,8 +39,8 @@ export interface SavedPlan {
   is_saved?: boolean;
   weeks: SavedPlanWeek[];
   user_id: number;
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SavedPlansResponse {

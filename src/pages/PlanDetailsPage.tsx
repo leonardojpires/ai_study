@@ -10,7 +10,7 @@ const DUMMY_PLAN: SavedPlan = {
   title: "Modern Full-Stack Web Development",
   description:
     "A practical roadmap for learning React, TypeScript, Node.js, and relational databases.",
-  createdAt: "2026-08-20T10:00:00.000Z",
+  created_at: "2026-08-20T10:00:00.000Z",
   weeks: [
     {
       week_number: 1,
@@ -158,9 +158,9 @@ export function PlanDetailsPage() {
                 <span className="rounded-full border border-[var(--glass-border)] bg-white/80 px-3 py-1.5">
                   {plann.weeks.length} weeks
                 </span>
-                {plann.createdAt && (
+                {plann.created_at && (
                   <span className="rounded-full border border-[var(--glass-border)] bg-white/80 px-3 py-1.5">
-                    Created {new Date(plann.createdAt).toLocaleDateString()}
+                    Created {new Date(plann.created_at).toLocaleDateString()}
                   </span>
                 )}
               </div>
