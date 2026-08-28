@@ -4,6 +4,7 @@ import { BrandMark } from "../BrandMark";
 import { ConfirmationModal } from "../ConfirmationModal";
 import { useToast } from "../ToastProvider";
 import { useAuth } from "../../hooks/auth/AuthProvider";
+import { ThemeToggle } from "../ThemeToggle";
 
 interface NavItem {
   to: string;
@@ -135,6 +136,7 @@ export function Sidebar() {
       )}
 
       <div className="flex-1" />
+      <ThemeToggle showLabel className="mb-3 w-full" />
       <footer className="rounded-lg border border-[var(--glass-border)] bg-white/45 p-4 text-xs leading-5 text-[var(--text-muted)]">
         <strong className="block text-[var(--text)]">Blueprint</strong>
         Your study plans, all in one place.

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BrandMark } from "../components/BrandMark";
 import { ConfirmationModal } from "../components/ConfirmationModal";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { useToast } from "../components/ToastProvider";
 import { useAuth } from "../hooks/auth/AuthProvider";
 
@@ -87,9 +88,10 @@ export function LandingPage() {
           >
             Guide
           </Link>
+          <ThemeToggle />
           <Link
             to={isAuthenticated ? "/chat" : "/login"}
-            className="rounded-lg border border-[var(--glass-border)] bg-white/55 px-4 py-2 text-sm font-semibold text-[var(--accent-strong)] shadow-sm backdrop-blur-xl transition hover:bg-white/80"
+            className={`landing-session-link ${isAuthenticated ? "landing-session-link-auth" : ""} rounded-lg border border-[var(--glass-border)] bg-white/55 px-4 py-2 text-sm font-semibold text-[var(--accent-strong)] shadow-sm backdrop-blur-xl transition hover:bg-white/80`}
           >
             {isAuthenticated ? "Open chat" : "Log in"}
           </Link>

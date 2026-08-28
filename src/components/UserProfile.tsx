@@ -378,7 +378,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
             disabled={isRemoving}
             className="dialog-backdrop absolute inset-0 bg-[#102316]/55 backdrop-blur-sm disabled:cursor-not-allowed"
           />
-          <div className="relative z-10 w-full max-w-md rounded-lg border border-[var(--glass-border)] bg-white p-6 shadow-2xl">
+          <div className="remove-plan-modal relative z-10 w-full max-w-md rounded-lg border border-[var(--glass-border)] bg-white p-6 shadow-2xl">
             <div className="flex items-start gap-4">
               <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
                 !

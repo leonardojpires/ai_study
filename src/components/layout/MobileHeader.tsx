@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { BrandMark } from "../BrandMark";
 import { useAuth } from "../../hooks/auth/AuthProvider";
+import { ThemeToggle } from "../ThemeToggle";
 
 export function MobileHeader() {
   const { isAuthenticated } = useAuth();
@@ -24,6 +25,7 @@ export function MobileHeader() {
         >
           <BrandMark />
         </button>
+        <ThemeToggle />
       </div>
 
       {isAuthenticated ? (

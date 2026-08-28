@@ -4,6 +4,7 @@ import { BrandMark } from "../components/BrandMark";
 import { LoginForm } from "../components/LoginForm";
 import { useToast } from "../components/ToastProvider";
 import { useAuth } from "../hooks/auth/AuthProvider";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 interface LocationState {
   from?: string;
@@ -52,9 +53,12 @@ export function LoginPage() {
 
   return (
     <main className="auth-page min-h-screen px-4 py-8">
-      <Link to="/" className="brand-lockup mx-auto mb-8 w-fit">
-        <BrandMark />
-      </Link>
+      <div className="auth-topbar mx-auto mb-8 flex w-full max-w-5xl items-center justify-between">
+        <Link to="/" className="brand-lockup">
+          <BrandMark />
+        </Link>
+        <ThemeToggle />
+      </div>
 
       <section className="auth-panel app-panel mx-auto grid w-full max-w-5xl overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white/60 shadow-2xl backdrop-blur-2xl md:grid-cols-[0.9fr_1fr]">
         <div className="hidden border-r border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-8 md:flex md:flex-col md:justify-between">
