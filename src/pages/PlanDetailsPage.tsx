@@ -99,7 +99,7 @@ export function PlanDetailsPage() {
         </Link>
 
         {isLoading && (
-          <section className="mt-5 rounded-lg border border-[var(--glass-border)] bg-white/70 p-8 shadow-xl backdrop-blur-xl">
+          <section className="app-panel mt-5 rounded-lg border border-[var(--glass-border)] bg-white/70 p-8 shadow-xl backdrop-blur-xl">
             <div className="flex min-h-40 flex-col items-center justify-center">
               <span className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--border)] border-t-[var(--accent)]" />
               <p className="mt-4 text-sm font-semibold text-[var(--text-muted)]">
@@ -110,7 +110,7 @@ export function PlanDetailsPage() {
         )}
 
         {isNotFound && !isLoading && (
-          <section className="mt-5 overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white/75 p-6 text-center shadow-xl backdrop-blur-xl sm:p-10">
+          <section className="app-panel mt-5 overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white/75 p-6 text-center shadow-xl backdrop-blur-xl sm:p-10">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--surface-soft)] text-[var(--accent)]">
               <svg
                 viewBox="0 0 24 24"
@@ -143,7 +143,7 @@ export function PlanDetailsPage() {
 
         {!isLoading && !isNotFound && (
           <>
-            <section className="mt-5 rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+            <section className="app-panel mt-5 rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
               <p className="eyebrow">Study plan</p>
               <h1 className="mt-3 text-3xl font-black leading-tight text-[var(--text)] sm:text-4xl">
                 {plann.title}
@@ -166,7 +166,7 @@ export function PlanDetailsPage() {
               </div>
             </section>
 
-            <section className="mt-6 rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+            <section className="app-panel mt-6 rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
               <h2 className="text-2xl font-black text-[var(--text)]">
                 Weekly breakdown
               </h2>
@@ -175,7 +175,7 @@ export function PlanDetailsPage() {
                 {plann.weeks.map((week) => (
                   <article
                     key={week.week_number}
-                    className="rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/65 p-5 sm:p-6"
+                    className="week-card rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/65 p-5 sm:p-6"
                   >
                     <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
                       Week {week.week_number}
@@ -204,7 +204,7 @@ export function PlanDetailsPage() {
                           {week.topics.map((topic) => (
                             <span
                               key={topic}
-                              className="rounded-full border border-[var(--glass-border)] bg-white/80 px-3 py-1.5 text-xs text-[var(--text-muted)]"
+                              className="topic-tag rounded-full border border-[var(--glass-border)] bg-white/80 px-3 py-1.5 text-xs text-[var(--text-muted)]"
                             >
                               {topic}
                             </span>

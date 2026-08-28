@@ -6,11 +6,11 @@ interface PlanActionBarProps {
 
 export function PlanActionBar({ onSave, onTryAgain, disabled }: PlanActionBarProps) {
   return (
-    <div className="mb-4 flex flex-col gap-3 rounded-lg border border-[var(--glass-border)] bg-[var(--success-bg)]/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="plan-action-bar mb-4 flex flex-col gap-3 rounded-lg border border-[var(--glass-border)] bg-[var(--success-bg)]/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <span className="text-sm font-medium text-[var(--success)]">
         Plan recommendation is ready. Save it or try again.
       </span>
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="plan-action-buttons flex flex-col gap-2 sm:flex-row">
         <button
           type="button"
           disabled={disabled}

@@ -33,7 +33,7 @@ export function ConfirmationModal({
         aria-label="Close dialog"
         disabled={isLoading}
         onClick={onCancel}
-        className="absolute inset-0 bg-[#102316]/55 backdrop-blur-sm disabled:cursor-not-allowed"
+        className="modal-backdrop absolute inset-0 bg-[#102316]/55 backdrop-blur-sm disabled:cursor-not-allowed"
       />
 
       <div className="modal-card relative z-10 w-full max-w-md rounded-lg border border-[var(--glass-border)] bg-white/88 p-6 shadow-2xl backdrop-blur-2xl">

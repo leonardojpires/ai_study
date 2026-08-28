@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 export function NotFoundPage() {
   return (
     <main className="auth-page flex min-h-screen items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md rounded-lg border border-[var(--glass-border)] bg-white/70 p-8 text-center shadow-2xl backdrop-blur-2xl">
+      <ThemeToggle className="absolute right-4 top-4" />
+      <div className="app-panel w-full max-w-md rounded-lg border border-[var(--glass-border)] bg-white/70 p-8 text-center shadow-2xl backdrop-blur-2xl">
         <p className="eyebrow">404</p>
         <h1 className="mt-2 text-2xl font-black text-[var(--text)]">
           Page not found

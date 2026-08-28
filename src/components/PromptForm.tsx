@@ -33,7 +33,7 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="flex items-end gap-3 rounded-lg border border-[var(--glass-border)] bg-white/85 px-4 py-3 shadow-sm backdrop-blur-xl">
+      <div className="prompt-composer flex items-end gap-3 rounded-lg border border-[var(--glass-border)] bg-white/85 px-4 py-3 shadow-sm backdrop-blur-xl">
         <textarea
           aria-label="Study plan prompt"
           value={prompt}
@@ -47,12 +47,12 @@ export function PromptForm({ isSubmitting, onSubmit, examples = [] }: PromptForm
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[var(--accent-strong)] disabled:opacity-60"
+          className="send-button inline-flex min-h-[48px] items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[var(--accent-strong)] disabled:opacity-60"
         >
           {isSubmitting ? "Sending..." : "Send"}
         </button>
       </div>
-      <div className="mt-2 flex items-center justify-between text-xs text-[var(--text-muted)]">
+      <div className="prompt-meta mt-2 flex items-center justify-between text-xs text-[var(--text-muted)]">
         <span>{charCount} characters</span>
         {examples.length > 0 && (
           <button

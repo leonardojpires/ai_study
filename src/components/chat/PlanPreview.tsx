@@ -15,7 +15,7 @@ interface PlanPreviewProps {
 
 export function PlanPreview({ plan }: PlanPreviewProps) {
   return (
-    <div className="mt-4 rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/75 px-4 py-4">
+    <div className="plan-preview mt-4 rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/75 px-4 py-4">
       <div className="space-y-3 text-sm text-black">
         <div className="rounded-lg border border-[var(--glass-border)] bg-white/75 p-4">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
@@ -33,7 +33,7 @@ export function PlanPreview({ plan }: PlanPreviewProps) {
           {plan.weeks.map((week) => (
             <div
               key={week.week_number}
-              className="rounded-lg border border-[var(--glass-border)] bg-white/80 p-3"
+              className="preview-week-row rounded-lg border border-[var(--glass-border)] bg-white/80 p-3"
             >
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm font-bold text-black">

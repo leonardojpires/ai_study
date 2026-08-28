@@ -16,7 +16,8 @@ export function ChatMessage({ message, children }: ChatMessageProps) {
 
   return (
     <div
-      className={`max-w-3xl ${
+      data-role={message.role}
+      className={`chat-message max-w-3xl ${
         isAssistant
           ? "self-start rounded-[1.25rem] rounded-bl-sm border border-[var(--glass-border)] bg-white/82 px-5 py-4 text-black shadow-sm backdrop-blur-xl"
           : "self-end rounded-[1.25rem] rounded-br-sm bg-[var(--accent)] px-5 py-4 text-black shadow-[0_12px_30px_rgba(31,85,56,0.22)]"
