@@ -76,8 +76,8 @@ export function ChatPage() {
   return (
     <section className="flex min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col bg-[var(--chat-surface)]">
-        <div className="border-b border-[var(--glass-border)] bg-white/70 px-5 py-4 backdrop-blur-xl sm:px-7">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="workspace-header border-b border-[var(--glass-border)] bg-white/70 px-5 py-4 backdrop-blur-xl sm:px-7">
+          <div className="workspace-header-inner flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
                 Workspace
@@ -86,7 +86,7 @@ export function ChatPage() {
                 Blueprint Chatroom
               </h1>
             </div>
-            <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-white/65 px-3 py-2 text-xs font-semibold text-[var(--text-muted)]">
+            <div className="status-chip inline-flex w-fit items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-white/65 px-3 py-2 text-xs font-semibold text-[var(--text-muted)]">
               <span className="h-2 w-2 rounded-full bg-[var(--success)]" />
               Ready to plan
             </div>
@@ -95,7 +95,7 @@ export function ChatPage() {
 
         <div className="min-h-0 flex-1 overflow-hidden">
           <div className="chat-scroll h-full min-h-0 overflow-y-auto px-4 py-6 pb-28 sm:px-7">
-            <div className="mx-auto flex w-full  flex-col gap-4">
+            <div className="chat-message-list mx-auto flex w-full flex-col gap-4">
               {messages.map((message, index) => {
                 const isLastAssistantReady =
                   message.role === "assistant" &&
@@ -116,7 +116,7 @@ export function ChatPage() {
           </div>
         </div>
 
-        <div className="z-20 border-t border-[var(--glass-border)] bg-white/80 px-4 py-4 shadow-[0_-18px_45px_rgba(16,35,22,0.08)] backdrop-blur-xl sm:px-7">
+        <div className="chat-composer-bar z-20 border-t border-[var(--glass-border)] bg-white/80 px-4 py-4 shadow-[0_-18px_45px_rgba(16,35,22,0.08)] backdrop-blur-xl sm:px-7">
           <div className="mx-auto w-full max-w-5xl">
             {hasReadyPreview && (
               <PlanActionBar

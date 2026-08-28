@@ -15,7 +15,7 @@ export function MobileHeader() {
   }
 
   return (
-    <header className="border-b border-[var(--glass-border)] bg-white/70 px-4 py-4 shadow-sm backdrop-blur-2xl md:hidden">
+    <header className="mobile-header border-b border-[var(--glass-border)] bg-white/70 px-4 py-4 shadow-sm backdrop-blur-2xl md:hidden">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
         <button
           type="button"
@@ -27,7 +27,7 @@ export function MobileHeader() {
       </div>
 
       {isAuthenticated ? (
-        <nav className="mx-auto mt-4 flex max-w-3xl gap-2">
+        <nav className="mobile-nav mx-auto mt-4 flex max-w-3xl gap-2">
           <NavLink to="/chat" end className={({ isActive }) => linkClass(isActive)}>
             Chat
           </NavLink>
@@ -39,7 +39,7 @@ export function MobileHeader() {
           </NavLink>
         </nav>
       ) : (
-        <div className="mx-auto mt-4 flex max-w-3xl gap-2">
+        <div className="mobile-nav mx-auto mt-4 flex max-w-3xl gap-2">
           <button
             type="button"
             className="flex-1 rounded-lg bg-[var(--accent)] px-3 py-2 text-sm font-semibold text-white"

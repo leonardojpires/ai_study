@@ -7,16 +7,16 @@ import { useAuth } from "../hooks/auth/AuthProvider";
 
 const features = [
   {
-    title: "Adaptive roadmaps",
-    text: "Turn a messy goal into weekly milestones, topics, and objectives.",
+    title: "Weekly structure",
+    text: "Break a broad subject into manageable weeks, topics, and objectives.",
   },
   {
-    title: "Chat-first planning",
-    text: "Refine your plan naturally instead of wrestling with forms.",
+    title: "Plan together",
+    text: "Answer a few focused questions and adjust the roadmap as you go.",
   },
   {
-    title: "Saved plan library",
-    text: "Keep your best roadmaps close and return when it is time to execute.",
+    title: "Keep your progress",
+    text: "Save useful plans and pick up exactly where you left off.",
   },
 ];
 
@@ -83,7 +83,7 @@ export function LandingPage() {
         <nav className="flex items-center gap-2">
           <Link
             to="/guide"
-            className="hidden rounded-lg px-4 py-2 text-sm font-semibold text-[var(--text-muted)] transition hover:bg-white/50 hover:text-[var(--text)] sm:inline-flex"
+            className="nav-link hidden px-3 py-2 text-sm font-semibold text-[var(--text-muted)] sm:inline-flex"
           >
             Guide
           </Link>
@@ -113,7 +113,7 @@ export function LandingPage() {
 
               {profileMenuOpen && (
                 <div
-                  className="absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white/95 shadow-2xl backdrop-blur-2xl"
+                  className="dropdown-menu absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white/95 shadow-2xl backdrop-blur-2xl"
                   role="menu"
                 >
                   <button
@@ -147,14 +147,13 @@ export function LandingPage() {
 
       <section className="landing-hero mx-auto grid h-[calc(100svh-5rem)] w-full max-w-7xl items-center gap-8 px-4 pb-5 sm:px-6 lg:grid-cols-[0.95fr_0.86fr] lg:px-8">
         <div className="hero-copy max-w-3xl">
-          <p className="eyebrow">Personal AI study roadmap</p>
+          <p className="eyebrow">A better way to plan your learning</p>
           <h1 className="mt-4 max-w-4xl text-4xl font-black leading-[0.98] tracking-normal text-[var(--text)] sm:text-5xl lg:text-6xl">
-            Study plans that feel structured, human, and ready to follow
+            A clear study plan for whatever you want to learn
           </h1>
           <p className="!mt-4 max-w-2xl text-base leading-7 text-[var(--text-muted)] sm:text-lg">
-            Build a weekly learning path from a simple conversation using Blueprint. Keep the
-            friendly green style, add a little glass, and make planning feel
-            calmer than a blank document.
+            Tell Blueprint what you want to learn and get a practical weekly
+            roadmap you can refine, save, and return to when it is time to study.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -178,9 +177,8 @@ export function LandingPage() {
 
         <div className="hero-preview" aria-label="Study plan interface preview">
           <div className="preview-toolbar">
-            <span />
-            <span />
-            <span />
+            <p>Blueprint workspace</p>
+            <span>Draft plan</span>
           </div>
           <div className="preview-plan">
             <div>

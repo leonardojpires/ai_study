@@ -159,7 +159,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
-      <section className="mx-auto flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+      <section className="app-panel mx-auto flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           <div className="inline-flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-3xl font-black text-white shadow-lg">
             {initials}
@@ -186,7 +186,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
         )}
 
         {user && !isLoading && (
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <dl className="profile-details mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[
               ["Name", user.name],
               ["Email", user.email],
@@ -194,22 +194,22 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
             ].map(([label, value]) => (
               <div
                 key={label}
-                className="rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-5"
+                className="profile-detail min-w-0 rounded-lg border border-[var(--glass-border)] px-5 py-4 sm:px-6"
               >
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
+                <dt className="text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
                   {label}
-                </p>
-                <p className="mt-2 break-words text-base font-bold text-[var(--text)]">
+                </dt>
+                <dd className="mt-1 break-words text-base font-semibold text-[var(--text)]">
                   {value}
-                </p>
+                </dd>
               </div>
             ))}
-          </div>
+          </dl>
         )}
       </section>
 
       { Boolean(user?.is_admin) && (
-      <section className="mx-auto mt-6 w-full max-w-6xl rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+      <section className="app-panel mx-auto mt-6 w-full max-w-6xl rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
         <p className="eyebrow">Security diagnostic</p>
         <h3 className="mt-2 text-2xl font-black text-[var(--text)]">
           CSRF token retrieval
@@ -233,7 +233,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
       </section>
       )}
 
-      <section className="mx-auto mt-6 flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+      <section className="app-panel mx-auto mt-6 flex w-full max-w-6xl flex-col rounded-lg border border-[var(--glass-border)] bg-white/70 p-6 shadow-xl backdrop-blur-xl sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="eyebrow">Library</p>
@@ -295,35 +295,36 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
 
         {!plansLoading && !plansError && total > 0 && (
           <>
-            <div className="mt-8 overflow-hidden">
+            <div className="mt-6 overflow-hidden">
               <div
-                className="flex transition-transform duration-500 ease-out"
+                className="flex transition-transform duration-300 ease-out"
                 style={{ transform: `translateX(-${activeIndex * 100}%)` }}
               >
                 {plans.map((plan) => (
                   <article key={plan.id} className="w-full shrink-0 px-1">
-                    <div className="flex min-h-[20rem] flex-col gap-4 rounded-lg border border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-6 sm:p-8">
-                      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
-                        Study Plan
-                      </p>
-                      <h4 className="break-words text-2xl font-black text-[var(--text)]">
-                        {plan.title}
-                      </h4>
-                      {plan.description && (
-                        <p className="text-base leading-7 text-[var(--text-muted)]">
-                          {plan.description}
+                    <div className="saved-plan-card flex flex-col gap-5 rounded-lg border border-[var(--glass-border)] p-5 sm:p-6 lg:flex-row lg:items-end lg:justify-between">
+                      <div className="min-w-0 max-w-3xl">
+                        <p className="text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
+                          Study plan
                         </p>
-                      )}
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
-                        <span className="rounded-full border border-[var(--glass-border)] bg-white/80 px-3 py-1 font-bold">
+                        <h4 className="mt-2 break-words text-xl font-semibold text-[var(--text)] sm:text-2xl">
+                          {plan.title}
+                        </h4>
+                        {plan.description && (
+                          <p className="mt-2 text-sm leading-6 text-[var(--text-muted)] sm:text-base">
+                            {plan.description}
+                          </p>
+                        )}
+                        <span className="plan-duration mt-4 inline-flex text-xs font-semibold text-[var(--text-muted)]">
                           {plan.weeks?.length ?? 0} weeks
                         </span>
                       </div>
-                      <div className="mt-auto flex flex-wrap gap-2 pt-4">
+
+                      <div className="saved-plan-actions flex shrink-0 flex-wrap gap-2">
                         <button
                           type="button"
                           onClick={() => navigate(`/plans/${plan.id}`)}
-                          className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[var(--accent-strong)]"
+                          className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
                         >
                           View details
                         </button>
@@ -331,7 +332,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
                           type="button"
                           onClick={() => openRemoveModal(plan)}
                           aria-label={`Remove plan ${plan.title}`}
-                          className="rounded-lg border border-red-200 bg-white/80 px-5 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-50"
+                          className="remove-plan-button rounded-lg border px-4 py-2 text-sm font-semibold transition"
                         >
                           Remove
                         </button>
@@ -375,7 +376,7 @@ export function UserProfile({ user, isLoading, error }: UserProfileProps) {
             aria-label="Close remove plan dialog"
             onClick={closeRemoveModal}
             disabled={isRemoving}
-            className="absolute inset-0 bg-[#102316]/55 backdrop-blur-sm disabled:cursor-not-allowed"
+            className="dialog-backdrop absolute inset-0 bg-[#102316]/55 backdrop-blur-sm disabled:cursor-not-allowed"
           />
           <div className="relative z-10 w-full max-w-md rounded-lg border border-[var(--glass-border)] bg-white p-6 shadow-2xl">
             <div className="flex items-start gap-4">

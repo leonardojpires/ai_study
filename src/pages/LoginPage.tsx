@@ -56,7 +56,7 @@ export function LoginPage() {
         <BrandMark />
       </Link>
 
-      <section className="auth-panel mx-auto grid w-full max-w-5xl overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white/60 shadow-2xl backdrop-blur-2xl md:grid-cols-[0.9fr_1fr]">
+      <section className="auth-panel app-panel mx-auto grid w-full max-w-5xl overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white/60 shadow-2xl backdrop-blur-2xl md:grid-cols-[0.9fr_1fr]">
         <div className="hidden border-r border-[var(--glass-border)] bg-[var(--surface-soft)]/70 p-8 md:flex md:flex-col md:justify-between">
           <div>
             <p className="eyebrow">Welcome back</p>
@@ -68,7 +68,7 @@ export function LoginPage() {
               when you are.
             </p>
           </div>
-          <div className="rounded-lg border border-[var(--glass-border)] bg-white/65 p-4 text-sm text-[var(--text-muted)]">
+          <div className="auth-aside-note rounded-lg border border-[var(--glass-border)] bg-white/65 p-4 text-sm text-[var(--text-muted)]">
             One good plan beats ten scattered tabs.
           </div>
         </div>

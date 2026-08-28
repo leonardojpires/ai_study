@@ -54,7 +54,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden h-screen w-72 shrink-0 border-r border-[var(--glass-border)] bg-white/55 px-5 py-6 shadow-[0_24px_70px_rgba(16,35,22,0.10)] backdrop-blur-2xl md:flex md:flex-col">
+    <aside className="app-sidebar hidden h-screen w-72 shrink-0 border-r border-[var(--glass-border)] bg-white/55 px-5 py-6 shadow-[0_24px_70px_rgba(16,35,22,0.10)] backdrop-blur-2xl md:flex md:flex-col">
       <button
         type="button"
         onClick={() => navigate("/")}
@@ -76,7 +76,7 @@ export function Sidebar() {
             to={item.to}
             end={item.to === "/chat"}
             className={({ isActive }) =>
-              `w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${
+              `sidebar-nav-link w-full rounded-lg px-4 py-3 text-left text-sm font-semibold transition ${
                 isActive
                   ? "bg-[var(--accent)] text-white shadow-sm"
                   : "text-[var(--text-muted)] hover:bg-white/70 hover:text-[var(--text)]"
@@ -108,7 +108,7 @@ export function Sidebar() {
           </button>
 
           {profileMenuOpen && (
-            <div className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white shadow-xl">
+            <div className="dropdown-menu absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white shadow-xl">
               <button
                 type="button"
                 className="w-full px-4 py-3 text-left text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-soft)]"
@@ -136,8 +136,8 @@ export function Sidebar() {
 
       <div className="flex-1" />
       <footer className="rounded-lg border border-[var(--glass-border)] bg-white/45 p-4 text-xs leading-5 text-[var(--text-muted)]">
-        <strong className="block text-[var(--text)]">StudyPlan AI</strong>
-        Built for focused learning in {new Date().getFullYear()}.
+        <strong className="block text-[var(--text)]">Blueprint</strong>
+        Your study plans, all in one place.
       </footer>
 
       {isLogoutModalOpen && (
