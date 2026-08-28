@@ -34,13 +34,6 @@ interface StudyPlanWeekTopicRow extends RowDataPacket {
   topic: string;
 }
 
-export class StudyPlanRepository implements IStudyPlanRepository {
-  constructor(private pool: Pool) {}
-
-  async create(studyPlan: StudyPlan): Promise<StudyPlan> {
-    const conn = await this.pool.getConnection();
-    if (!studyPlan.user_id) throw new Error("User not found");
-
     // NOTE ON mysql2 `pool.query()` RETURN VALUE:
     //
     // `pool.query()` always resolves to a tuple: [result, fields].
@@ -63,6 +56,13 @@ export class StudyPlanRepository implements IStudyPlanRepository {
     // - Do NOT treat `result` as an array (e.g., `result[0]` is incorrect).
     // - Always provide a generic type to `query()` (e.g., <ResultSetHeader>)
     //   to avoid using `any` and to let TypeScript catch incorrect assumptions.
+
+export class StudyPlanRepository implements IStudyPlanRepository {
+  constructor(private pool: Pool) {}
+
+  async create(studyPlan: StudyPlan): Promise<StudyPlan> {
+    const conn = await this.pool.getConnection();
+    if (!studyPlan.user_id) throw new Error("User not found");
 
     try {
       await conn.beginTransaction();

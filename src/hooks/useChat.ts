@@ -5,7 +5,7 @@ import { PlanPreviewData } from "../components/chat/PlanPreview";
 
 const WELCOME_MESSAGE: ChatMessageData = {
   role: "assistant",
-  text: "Hello! I am the study assistant powered by Groq AI. Tell me what you want to learn and I will create a study plan for you.",
+  text: "Hello! I'm Blueprint, your study assistant. Tell me what you want to learn and I will create a study plan for you.",
   status: "needs-info",
 };
 
